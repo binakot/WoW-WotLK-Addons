@@ -1,0 +1,7 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file='LibStub\LibStub.lua'/>
+	<Script file='CallbackHandler-1.0\CallbackHandler-1.0.lua'/>
+	<Script file='LibSharedMedia-3.0\LibSharedMedia-3.0.lua'/>
+	<Script file='LibGroupTalents-1.0\LibGroupTalents-1.0.lua'/>
+	<Script file='LibTalentQuery-1.0\LibTalentQuery-1.0.lua'/>
+</Ui>

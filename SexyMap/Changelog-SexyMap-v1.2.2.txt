@@ -1,0 +1,12 @@
+tag v1.2.2
+d0bf708deb7d99836d42d7cf24c9401c9ba1a96d
+unknown <Chris@.(none)>
+2009-12-10 18:51:15 -0700
+
+Tagging as 1.2.2
+
+
+--------------------
+
+unknown:
+	- Make the instance difficulty banner movable/hidable

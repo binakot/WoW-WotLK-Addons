@@ -1,0 +1,75 @@
+------------------------------------------------------------------------
+r71 | mgotovtsev | 2010-07-07 12:05:08 +0000 (Wed, 07 Jul 2010) | 1 line
+Changed paths:
+   A /tags/1.3.6 (from /trunk:70)
+
+Created tag 1.3.6.
+------------------------------------------------------------------------
+r70 | mgotovtsev | 2010-07-07 12:04:52 +0000 (Wed, 07 Jul 2010) | 7 lines
+Changed paths:
+   M /trunk/Localization-ruRU.lua
+   M /trunk/Localization.lua
+   M /trunk/Pawn-RU.toc
+   M /trunk/Pawn.lua
+   M /trunk/PawnUI.lua
+   M /trunk/PawnUI.xml
+   M /trunk/Readme.htm
+   A /trunk/Textures/Question.tga
+   M /trunk/Version history.htm
+   M /trunk/VgerCore/Readme.htm
+   M /trunk/VgerCore/VgerCore.lua
+   M /trunk/Wowhead.lua
+
+Version 1.3.6
+
+    * Thanks to some gnomish performance engineering, Pawn now uses about 95% less CPU time during login, which should reduce your login times by a second or two.
+    * Added a new scale from Wowhead for arms warriors.
+    * Changed the (*) warning message to be a little clearer, and now it has a new (?) icon.  Pawn now calls item properties that it doesn't recognize "special effects."
+    * Fixed a bug where the item special effect warning message wasn't showing up even when enabled.
+    * Fixed a bug that might occur after the Wowhead scales (or any scales from a "plugin" of any sort) were disabled by deleting Wowhead.lua
+------------------------------------------------------------------------
+r68 | mgotovtsev | 2010-07-02 13:26:47 +0000 (Fri, 02 Jul 2010) | 5 lines
+Changed paths:
+   M /trunk/Localization-ruRU.lua
+   M /trunk/Localization.lua
+   M /trunk/Pawn-RU.toc
+   M /trunk/Pawn.lua
+   M /trunk/PawnUI.xml
+   M /trunk/Readme.htm
+   M /trunk/Version history.htm
+
+Version 1.3.5
+    * Changed a bunch of text to make it even easier for new users to get started with Pawn.
+    * The default for new users of Pawn is now to only show the base values of items.  If you're already using Pawn and have current item values shown, your settings won't be changed and you'll still see both numbers.
+    * Rearranged the list of stats on the Values tab so that more common stats are easier to find, and really rare stats like raw health aren't wasting prime screen real estate.
+    * Added support for items with mastery rating for those of you in the Cataclysm beta.
+------------------------------------------------------------------------
+r66 | mgotovtsev | 2010-07-01 13:38:24 +0000 (Thu, 01 Jul 2010) | 1 line
+Changed paths:
+   M /trunk/Pawn-RU.toc
+   M /trunk/Pawn.lua
+   M /trunk/PawnUI.lua
+   M /trunk/Readme.htm
+   M /trunk/VgerCore/Readme.htm
+   M /trunk/VgerCore/VgerCore.lua
+
+Обновление до 1.3.4 (патч 3.3.5)
+------------------------------------------------------------------------
+r64 | mgotovtsev | 2010-06-09 09:03:34 +0000 (Wed, 09 Jun 2010) | 1 line
+Changed paths:
+   M /trunk/Localization-ruRU.lua
+   M /trunk/Pawn-RU.toc
+   M /trunk/Pawn.lua
+   M /trunk/Readme.htm
+   M /trunk/Version history.htm
+   M /trunk/Wowhead.lua
+
+Обновление до версии 1.3.3, обновлена Легкотканая вышивка
+------------------------------------------------------------------------
+r63 | mgotovtsev | 2010-03-29 11:31:16 +0000 (Mon, 29 Mar 2010) | 2 lines
+Changed paths:
+   M /trunk/Pawn-RU.toc
+
+Добавлена опциональный аддон для сравнения вещей (Moncai Compare)
+и сделана надпись Pawn в зеленом цвете (для фана)
+------------------------------------------------------------------------
