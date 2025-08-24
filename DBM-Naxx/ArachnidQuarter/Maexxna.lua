@@ -19,12 +19,15 @@ local warnWebSprayNow	= mod:NewSpellAnnounce(29484, 3)
 local warnSpidersSoon	= mod:NewAnnounce("WarningSpidersSoon", 2, 17332)
 local warnSpidersNow	= mod:NewAnnounce("WarningSpidersNow", 4, 17332)
 
-local timerWebSpray		= mod:NewNextTimer(40.5, 29484)
+local timerWebSpray		= mod:NewNextTimer(29.5, 29484)
 local timerSpider		= mod:NewTimer(30, "TimerSpider", 17332)
+local soundWebSpray		= mod:NewSound3(29484)
+
 
 function mod:OnCombatStart(delay)
 	warnWebSpraySoon:Schedule(35.5 - delay)
 	timerWebSpray:Start(40.5 - delay)
+	soundWebSpray:Schedule(37.5 - delay)
 	warnSpidersSoon:Schedule(25 - delay)
 	warnSpidersNow:Schedule(30 - delay)
 	timerSpider:Start(30 - delay)
@@ -33,8 +36,8 @@ end
 function mod:OnCombatEnd(wipe)
 	if not wipe then
 		if DBM.Bars:GetBar(L.ArachnophobiaTimer) then
-			DBM.Bars:CancelBar(L.ArachnophobiaTimer) 
-		end	
+			DBM.Bars:CancelBar(L.ArachnophobiaTimer)
+		end
 	end
 end
 
@@ -52,6 +55,7 @@ function mod:SPELL_CAST_SUCCESS(args)
 		warnWebSprayNow:Show()
 		warnWebSpraySoon:Schedule(35.5)
 		timerWebSpray:Start()
+		soundWebSpray:Schedule(26.5)
 		warnSpidersSoon:Schedule(25)
 		warnSpidersNow:Schedule(30)
 		timerSpider:Start()

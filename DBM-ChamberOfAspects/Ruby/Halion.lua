@@ -17,7 +17,7 @@ mod:RegisterEvents(
 	"SPELL_DAMAGE",
 	"CHAT_MSG_MONSTER_YELL",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
-	"UNIT_HEALTH"
+	"UNIT_HEALTH boss1"
 )
 
 local warnPhase2Soon				= mod:NewAnnounce("WarnPhase2Soon", 2)
@@ -27,30 +27,32 @@ local warnPhase3					= mod:NewPhaseAnnounce(3)
 local warningShadowConsumption		= mod:NewTargetAnnounce(74792, 4)
 local warningFieryConsumption		= mod:NewTargetAnnounce(74562, 4)
 local warningMeteor					= mod:NewSpellAnnounce(74648, 3)
-local warningShadowBreath			= mod:NewSpellAnnounce(75954, 2, nil, mod:IsTank() or mod:IsHealer())
-local warningFieryBreath			= mod:NewSpellAnnounce(74526, 2, nil, mod:IsTank() or mod:IsHealer())
-local warningTwilightCutter			= mod:NewAnnounce("TwilightCutterCast", 4, 77844)
+local warningShadowBreath			= mod:NewSpellAnnounce(75954, 2, nil, true)
+local warningFieryBreath			= mod:NewSpellAnnounce(74526, 2, nil, true)
+local warningTwilightCutter			= mod:NewAnnounce("TwilightCutterCast", 2, 77844)
 
-local specWarnShadowConsumption		= mod:NewSpecialWarningRun(74792)
-local specWarnFieryConsumption		= mod:NewSpecialWarningRun(74562)
-local specWarnMeteorStrike			= mod:NewSpecialWarningMove(75952)
-local specWarnTwilightCutter		= mod:NewSpecialWarningSpell(77844)
+local specWarnShadowConsumption		= mod:NewSpecialWarningRun(74792, nil, nil, nil, 1, 2)
+local yellShadowconsumption			= mod:NewYellMe(74792)
+local specWarnFieryCombustion		= mod:NewSpecialWarningRun(74562, nil, nil, nil, 1, 2)
+local yellFieryCombustion			= mod:NewYellMe(74562)
+local specWarnMeteorStrike			= mod:NewSpecialWarningMove(75952, nil, nil, nil, 2, 2)
+local specWarnTwilightCutter		= mod:NewSpecialWarningSpell(77844, nil, nil, nil, 3, 2)
 
-local timerShadowConsumptionCD		= mod:NewNextTimer(25, 74792)
-local timerFieryConsumptionCD		= mod:NewNextTimer(25, 74562)
-local timerMeteorCD					= mod:NewNextTimer(40, 74648)
+local timerShadowConsumptionCD		= mod:NewNextTimer(25, 74792, nil, nil, nil, 3)
+local timerFieryConsumptionCD		= mod:NewNextTimer(25, 74562, nil, nil, nil, 3)
+local timerMeteorCD					= mod:NewNextTimer(40, 74648, nil, nil, nil, 3)
 local timerMeteorCast				= mod:NewCastTimer(7, 74648)--7-8 seconds from boss yell the meteor impacts.
 local timerTwilightCutterCast		= mod:NewCastTimer(5, 77844)
-local timerTwilightCutter			= mod:NewBuffActiveTimer(10, 77844)
-local timerTwilightCutterCD			= mod:NewNextTimer(15, 77844)
-local timerShadowBreathCD			= mod:NewCDTimer(19, 75954, nil, mod:IsTank() or mod:IsHealer())--Same as debuff timers, same CD, can be merged into 1.
-local timerFieryBreathCD			= mod:NewCDTimer(19, 74526, nil, mod:IsTank() or mod:IsHealer())--But unique icons are nice pertaining to phase you're in ;)
+local timerTwilightCutter			= mod:NewBuffActiveTimer(10, 77844, nil, nil, nil, 6)
+local timerTwilightCutterCD			= mod:NewNextTimer(15, 77844, nil, nil, nil, 6)
+local timerShadowBreathCD			= mod:NewCDTimer(19, 75954, nil, true, nil, 5)--Same as debuff timers, same CD, can be merged into 1.
+local timerFieryBreathCD			= mod:NewCDTimer(19, 74526, nil, true, nil, 5)--But unique icons are nice pertaining to phase you're in ;)
 
 local berserkTimer					= mod:NewBerserkTimer(480)
 
 local soundConsumption 				= mod:NewSound(74562, "SoundOnConsumption")
-
-mod:AddBoolOption("YellOnConsumption", true, "announce")
+local soundMeteor					= mod:NewSound(74648)
+local soundCutters					= mod:NewSound(77844)
 mod:AddBoolOption("AnnounceAlternatePhase", true, "announce")
 mod:AddBoolOption("WhisperOnConsumption", false, "announce")
 mod:AddBoolOption("SetIconOnConsumption", true)
@@ -60,6 +62,8 @@ local warned_preP3 = false
 local lastflame = 0
 local lastshroud = 0
 local phases = {}
+
+mod.vb.phase = 1
 
 function mod:LocationChecker()
 	if GetTime() - lastshroud < 6 then
@@ -74,6 +78,8 @@ local function updateHealthFrame(phase)
 		return
 	end
 	phases[phase] = true
+	mod.vb.phase = phase
+
 	if phase == 1 then
 		DBM.BossHealth:Clear()
 		DBM.BossHealth:AddBoss(39863, L.NormalHalion)
@@ -90,7 +96,7 @@ function mod:OnCombatStart(delay)--These may still need retuning too, log i had 
 	table.wipe(phases)
 	warned_preP2 = false
 	warned_preP3 = false
-	phase2Started = 0
+	self:SetStage(1)
 	lastflame = 0
 	lastshroud = 0
 	berserkTimer:Start(-delay)
@@ -145,10 +151,8 @@ function mod:SPELL_AURA_APPLIED(args)--We don't use spell cast success for actua
 		end
 		if args:IsPlayer() then
 			specWarnShadowConsumption:Show()
-			soundConsumption:Play()
-			if self.Options.YellOnConsumption then
-				SendChatMessage(L.YellConsumption, "SAY")
-			end
+			specWarnShadowConsumption:Play("runout")
+			yellShadowconsumption:Yell()
 		end
 		if self.Options.SetIconOnConsumption then
 			self:SetIcon(args.destName, 7)
@@ -164,11 +168,9 @@ function mod:SPELL_AURA_APPLIED(args)--We don't use spell cast success for actua
 			self:SendSync("FieryTarget", args.destName)
 		end
 		if args:IsPlayer() then
-			specWarnFieryConsumption:Show()
-			soundConsumption:Play()
-			if self.Options.YellOnConsumption then
-				SendChatMessage(L.YellCombustion, "SAY")
-			end
+			specWarnFieryCombustion:Show()
+			specWarnFieryCombustion:Play("runout")
+			yellFieryCombustion:Yell()
 		end
 		if self.Options.SetIconOnConsumption then
 			self:SetIcon(args.destName, 8)
@@ -200,15 +202,16 @@ end
 function mod:UNIT_HEALTH(uId)
 	if not warned_preP2 and self:GetUnitCreatureId(uId) == 39863 and UnitHealth(uId) / UnitHealthMax(uId) <= 0.79 then
 		warned_preP2 = true
-		warnPhase2Soon:Show()	
+		warnPhase2Soon:Show()
 	elseif not warned_preP3 and self:GetUnitCreatureId(uId) == 40142 and UnitHealth(uId) / UnitHealthMax(uId) <= 0.54 then
 		warned_preP3 = true
-		warnPhase3Soon:Show()	
+		warnPhase3Soon:Show()
 	end
 end
 
 function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg == L.Phase2 or msg:find(L.Phase2) then
+		self:SetStage(2)
 		updateHealthFrame(2)
 		timerFieryBreathCD:Cancel()
 		timerMeteorCD:Cancel()
@@ -224,6 +227,7 @@ function mod:CHAT_MSG_MONSTER_YELL(msg)
 	elseif msg == L.Phase3 or msg:find(L.Phase3) then
 		self:SendSync("Phase3")
 	elseif msg == L.MeteorCast or msg:find(L.MeteorCast) then--There is no CLEU cast trigger for meteor, only yell
+		soundMeteor:Play("Interface\\AddOns\\DBM-Core\\sounds\\beware.ogg")
 		if not self.Options.AnnounceAlternatePhase then
 			warningMeteor:Show()
 			timerMeteorCast:Start()--7 seconds from boss yell the meteor impacts.
@@ -237,6 +241,7 @@ end
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
 	if msg == L.twilightcutter or msg:find(L.twilightcutter) then
+			soundCutters:Play("Interface\\AddOns\\DBM-Core\\sounds\\beware.ogg")
 			specWarnTwilightCutter:Schedule(5)
 		if not self.Options.AnnounceAlternatePhase then
 			warningTwilightCutter:Show()
@@ -295,6 +300,7 @@ function mod:OnSync(msg, target)
 			end
 		end
 	elseif msg == "Phase3" then
+		self:SetStage(3)
 		updateHealthFrame(3)
 		warnPhase3:Show()
 		timerMeteorCD:Start(30) --These i'm not sure if they start regardless of drake aggro, or if it varies as well.

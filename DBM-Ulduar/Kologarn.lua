@@ -1,4 +1,4 @@
-﻿local mod	= DBM:NewMod("Kologarn", "DBM-Ulduar")
+local mod	= DBM:NewMod("Kologarn", "DBM-Ulduar")
 local L		= mod:GetLocalizedStrings()
 
 mod:SetRevision(("$Revision: 4134 $"):sub(12, -3))
@@ -28,21 +28,28 @@ local warnCrunchArmor			= mod:NewTargetAnnounce(64002, 2)
 
 local specWarnCrunchArmor2		= mod:NewSpecialWarningStack(64002, false, 2)
 local specWarnEyebeam			= mod:NewSpecialWarningYou(63346)
+local specWarnEyebeamNear		= mod:NewSpecialWarningClose(63346, nil, nil, nil, 1, 2)
 
 local timerCrunch10             = mod:NewTargetTimer(6, 63355)
 local timerNextShockwave		= mod:NewCDTimer(18, 63982)
-local timerRespawnLeftArm		= mod:NewTimer(48, "timerLeftArm")
-local timerRespawnRightArm		= mod:NewTimer(48, "timerRightArm")
+local timerRespawnLeftArm		= mod:NewTimer(30, "timerLeftArm")
+local timerRespawnRightArm		= mod:NewTimer(30, "timerRightArm")
 local timerTimeForDisarmed		= mod:NewTimer(10, "achievementDisarmed")	-- 10 HC / 12 nonHC
 
+local enrageTimer				= mod:NewBerserkTimer(600)
+
 -- 5/23 00:33:48.648  SPELL_AURA_APPLIED,0x0000000000000000,nil,0x80000000,0x0480000001860FAC,"Hâzzad",0x4000512,63355,"Crunch Armor",0x1,DEBUFF
--- 6/3 21:41:56.140 UNIT_DIED,0x0000000000000000,nil,0x80000000,0xF1500080A60274A0,"Rechter Arm",0xa48 
+-- 6/3 21:41:56.140 UNIT_DIED,0x0000000000000000,nil,0x80000000,0xF1500080A60274A0,"Rechter Arm",0xa48
 
 mod:AddBoolOption("HealthFrame", true)
 mod:AddBoolOption("SetIconOnGripTarget", true)
 mod:AddBoolOption("PlaySoundOnEyebeam", true)
 mod:AddBoolOption("SetIconOnEyebeamTarget", true)
-mod:AddBoolOption("YellOnBeam", true, "announce")
+mod:AddBoolOption("YellOnBeam", true, "yell")
+
+function mod:OnCombatStart(delay)
+	enrageTimer:Start(600-delay)
+end
 
 function mod:UNIT_DIED(args)
 	if self:GetCIDFromGUID(args.destGUID) == 32934 then 		-- right arm
@@ -66,7 +73,7 @@ function mod:SPELL_DAMAGE(args)
 	if args:IsSpellID(63783, 63982) and args:IsPlayer() then	-- Shockwave
 		timerNextShockwave:Start()
 	elseif args:IsSpellID(63346, 63976) and args:IsPlayer() then
-		specWarnEyebeam:Show()
+		specWarnEyebeamNear:Show(args.destName)
 	end
 end
 
@@ -82,23 +89,25 @@ function mod:OnSync(msg, target)
 		if target == UnitName("player") then
 			specWarnEyebeam:Show()
 			if self.Options.PlaySoundOnEyebeam then
-				PlaySoundFile("Sound\\Creature\\HoodWolf\\HoodWolfTransformPlayer01.wav") 
+				PlaySoundFile("Sound\\Creature\\HoodWolf\\HoodWolfTransformPlayer01.wav")
 			end
 			if self.Options.YellOnBeam then
 				SendChatMessage(L.YellBeam, "SAY")
 			end
-		end 
+		end
 		if self.Options.SetIconOnEyebeamTarget then
-			self:SetIcon(target, 5, 8) 
+			self:SetIcon(target, 5, 8)
 		end
 	end
 end
 
 local gripTargets = {}
+
 function mod:GripAnnounce()
 	warnGrip:Show(table.concat(gripTargets, "<, >"))
 	table.wipe(gripTargets)
 end
+
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(64290, 64292) then
 		if self.Options.SetIconOnGripTarget then
@@ -122,7 +131,7 @@ end
 function mod:SPELL_AURA_APPLIED_DOSE(args)
 	if args:IsSpellID(64002) then		        -- Crunch Armor (25-man only)
 		warnCrunchArmor:Show(args.destName)
-        if args.amount >= 2 then 
+        if args.amount >= 2 then
             if args:IsPlayer() then
                 specWarnCrunchArmor2:Show(args.amount)
             end

@@ -20,7 +20,8 @@ mod:RegisterEvents(
 	"SPELL_SUMMON",
 	"CHAT_MSG_RAID_BOSS_EMOTE",
 	"UNIT_TARGET",
-	"UNIT_SPELLCAST_SUCCEEDED"
+	"CHAT_MSG_MONSTER_YELL",
+	"UNIT_SPELLCAST_SUCCEEDED boss1 boss2 boss3"
 )
 
 local warnTargetSwitch			= mod:NewAnnounce("WarnTargetSwitch", 3, 70952)
@@ -31,26 +32,30 @@ local warnEmpoweredFlames		= mod:NewTargetAnnounce(72040, 4)
 local warnGliteringSparks		= mod:NewTargetAnnounce(72798, 2)
 local warnShockVortex			= mod:NewTargetAnnounce(72037, 3)				-- 1,5sec cast
 local warnEmpoweredShockVortex	= mod:NewCastAnnounce(72039, 4)					-- 4,5sec cast
-local warnKineticBomb			= mod:NewSpellAnnounce(72053, 3, nil, mod:IsRanged())
+local warnKineticBomb			= mod:NewSpellAnnounce(72053, 3, nil, "Ranged")
 local warnDarkNucleus			= mod:NewSpellAnnounce(71943, 1, nil, false)	-- instant cast
 
-local specWarnVortex			= mod:NewSpecialWarning("SpecWarnVortex")
-local specWarnVortexNear		= mod:NewSpecialWarning("SpecWarnVortexNear")
-local specWarnEmpoweredShockV	= mod:NewSpecialWarningRun(72039)
-local specWarnEmpoweredFlames	= mod:NewSpecialWarningRun(72040)
-local specWarnShadowPrison		= mod:NewSpecialWarningStack(72999, nil, 6)
+local specWarnVortex			= mod:NewSpecialWarningYou(72037, nil, nil, nil, 1, 2)
+local yellVortex				= mod:NewYellMe(72037)
+local specWarnVortexNear		= mod:NewSpecialWarningClose(72037, nil, nil, nil, 1, 2)
+local specWarnEmpoweredShockV	= mod:NewSpecialWarningMoveAway(72039, nil, nil, nil, 1, 2)
+local specWarnEmpoweredFlames	= mod:NewSpecialWarningRun(72040, nil, nil, nil, 4, 2)
+local specWarnShadowPrison		= mod:NewSpecialWarningStack(72999, nil, 6, nil, nil, 1, 6)
 
 local timerTargetSwitch			= mod:NewTimer(47, "TimerTargetSwitch", 70952)	-- every 46-47seconds
-local timerDarkNucleusCD		= mod:NewCDTimer(10, 71943, nil, false)	-- usually every 10 seconds but sometimes more
-local timerConjureFlamesCD		= mod:NewCDTimer(20, 71718)				-- every 20-30 seconds but never more often than every 20sec
-local timerGlitteringSparksCD	= mod:NewCDTimer(20, 72798)				-- This is pretty nasty on heroic
-local timerShockVortex			= mod:NewCDTimer(16.5, 72037)			-- Seen a range from 16,8 - 21,6
-local timerKineticBombCD		= mod:NewCDTimer(18, 72053, nil, mod:IsRanged())				-- Might need tweaking
-local timerShadowPrison			= mod:NewBuffActiveTimer(10, 72999)		-- Hard mode debuff
+local timerDarkNucleusCD		= mod:NewCDTimer(10, 71943, nil, false, nil, 5)	-- usually every 10 seconds but sometimes more
+local timerConjureFlamesCD		= mod:NewCDTimer(20, 71718, nil, nil, nil, 3) -- every 20-30 seconds but never more often than every 20sec
+local timerGlitteringSparksCD	= mod:NewCDTimer(20, 72798, nil, nil, nil, 2) -- This is pretty nasty on heroic
+local timerShockVortex			= mod:NewCDTimer(15.0, 72037, nil, nil, nil, 3) -- Seen a range from 16,8 - 21,6
+local timerShockVortexMax		= mod:NewCDTimer(20.0, 72814, nil, nil, nil, 3) -- Seen a range from 16,8 - 21,6
+local timerKineticBombCD		= mod:NewCDTimer(18, 72053, nil, "Ranged", nil, 1) -- Might need tweaking
+local timerShadowPrison			= mod:NewBuffFadesTimer(10, 72999, nil, nil, nil, 5) -- Hard mode debuff
 
 local berserkTimer				= mod:NewBerserkTimer(600)
 
 local soundEmpoweredFlames		= mod:NewSound(72040)
+local soundEmpoweredV			= mod:NewSound(72039)
+local soundSwitch				= mod:NewSound(70952)
 mod:AddBoolOption("EmpoweredFlameIcon", true)
 mod:AddBoolOption("ActivePrinceIcon", false)
 mod:AddBoolOption("RangeFrame", true)
@@ -70,6 +75,8 @@ function mod:OnCombatStart(delay)
 	berserkTimer:Start(-delay)
 	warnTargetSwitchSoon:Schedule(42-delay)
 	timerTargetSwitch:Start(-delay)
+	timerShockVortex:Start(-delay)
+	timerShockVortexMax:Start(-delay)
 	activePrince = nil
 	table.wipe(glitteringSparksTargets)
 	if self.Options.RangeFrame then
@@ -94,9 +101,10 @@ end
 function mod:OldShockVortexTarget()
 	local targetname = self:GetBossTarget(37970)
 	if not targetname then return end
-		warnShockVortex:Show(targetname)
+	warnShockVortex:Show(targetname)
 	if targetname == UnitName("player") then
 		specWarnVortex:Show()
+		yellVortex:Yell()
 	elseif targetname then
 		local uId = DBM:GetRaidUnitId(targetname)
 		if uId then
@@ -107,7 +115,7 @@ function mod:OldShockVortexTarget()
 				x, y = GetPlayerMapPosition(uId)
 			end
 			if inRange then
-				specWarnVortexNear:Show()
+				specWarnVortexNear:Show(targetname)
 				if self.Options.VortexArrow then
 					DBM.Arrow:ShowRunAway(x, y, 10, 5)
 				end
@@ -145,7 +153,8 @@ function mod:SPELL_CAST_START(args)
 	elseif args:IsSpellID(72039, 73037, 73038, 73039) then	-- Empowered Shock Vortex(73037, 73038, 73039 drycoded from wowhead)
 		warnEmpoweredShockVortex:Show()
 		specWarnEmpoweredShockV:Show()
-		timerShockVortex:Start()
+		soundEmpoweredV:Play("Interface\\AddOns\\DBM-Core\\sounds\\beware.ogg")
+		timerShockVortex:Start(30)
 	elseif args:IsSpellID(71718) then	-- Conjure Flames
 		warnConjureFlames:Show()
 		timerConjureFlamesCD:Start()
@@ -158,6 +167,7 @@ end
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(70952) and self:IsInCombat() then
 		warnTargetSwitch:Show(L.Valanar)
+		soundSwitch:Play("Interface\\AddOns\\DBM-Core\\sounds\\Info.mp3")
 		warnTargetSwitchSoon:Schedule(42)
 		timerTargetSwitch:Start()
 		activePrince = args.destGUID
@@ -166,6 +176,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 	elseif args:IsSpellID(70981) and self:IsInCombat() then
 		warnTargetSwitch:Show(L.Keleseth)
+		soundSwitch:Play("Interface\\AddOns\\DBM-Core\\sounds\\Info.mp3")
 		warnTargetSwitchSoon:Schedule(42)
 		timerTargetSwitch:Start()
 		activePrince = args.destGUID
@@ -174,6 +185,7 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 	elseif args:IsSpellID(70982) and self:IsInCombat() then
 		warnTargetSwitch:Show(L.Taldaram)
+		soundSwitch:Play("Interface\\AddOns\\DBM-Core\\sounds\\Info.mp3")
 		warnTargetSwitchSoon:Schedule(42)
 		timerTargetSwitch:Start()
 		activePrince = args.destGUID
@@ -183,7 +195,7 @@ function mod:SPELL_AURA_APPLIED(args)
 	elseif args:IsSpellID(72999) then	--Shadow Prison (hard mode)
 		if args:IsPlayer() then
 			timerShadowPrison:Start()
-			if (args.amount or 1) >= 6 then	--Placeholder right now, might use a different value
+			if (args.amount or 1) >= 10 then	--Placeholder right now, might use a different value
 				specWarnShadowPrison:Show(args.amount)
 			end
 		end
@@ -204,8 +216,9 @@ function mod:SPELL_SUMMON(args)
 end
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg, _, _, _, target)
-	if msg:match(L.EmpoweredFlames) then
+	if msg:match(L.EmpoweredFlames) or msg:match(L.EmpoweredFlames2) then
 		warnEmpoweredFlames:Show(target)
+		soundEmpoweredFlames:Play("Interface\\AddOns\\DBM-Core\\sounds\\beware.ogg")
 		if target == UnitName("player") then
 			specWarnEmpoweredFlames:Show()
 			soundEmpoweredFlames:Play()
@@ -241,7 +254,7 @@ function mod:OnSync(msg, target)
 			warnShockVortex:Show(target)
 			if target == UnitName("player") then
 				specWarnVortex:Show()
-			elseif targetname then
+			elseif target then
 				local uId = DBM:GetRaidUnitId(target)
 				if uId then
 					local inRange = CheckInteractDistance(uId, 2)
@@ -251,7 +264,7 @@ function mod:OnSync(msg, target)
 						x, y = GetPlayerMapPosition(uId)
 					end
 					if inRange then
-						specWarnVortexNear:Show()
+						specWarnVortexNear:Show(target)
 						if self.Options.VortexArrow then
 							DBM.Arrow:ShowRunAway(x, y, 10, 5)
 						end

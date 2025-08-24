@@ -35,7 +35,7 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-	WarnMortalWound	= "%s on >%s< (%d)",		-- Mortal Wound on >args.destName< (args.amount)
+	WarnMortalWound	= "%s on >%s< (%s)",		-- Mortal Wound on >args.destName< (args.amount)
 	SpecWarnTrap	= "Trap Activated! - Vengeful Fleshreapers incoming"--creatureid 37038
 }
 
@@ -133,9 +133,10 @@ L:SetTimerLocalization{
 
 L:SetWarningLocalization{
 	WarnReanimating				= "Add reviving",			-- Reanimating an adherent or fanatic
-	WarnTouchInsignificance		= "%s on >%s< (%d)",		-- Touch of Insignificance on >args.destName< (args.amount)
+	WarnTouchInsignificance		= "%s on >%s< (%s)",		-- Touch of Insignificance on >args.destName< (args.amount)
 	WarnAddsSoon				= "New adds soon",
-	SpecWarnVengefulShade		= "Vengeful Shade attacking you - Run Away"--creatureid 38222
+	SpecWarnVengefulShade		= "Vengeful Shade attacking you - Run Away",--creatureid 38222
+	WeaponsStatus				= "Auto Unequipping enabled",
 }
 
 L:SetOptionLocalization{
@@ -143,20 +144,28 @@ L:SetOptionLocalization{
 	WarnReanimating				= "Show warning when an add is being revived",	-- Reanimated Adherent/Fanatic spawning
 	TimerAdds					= "Show timer for new adds",
 	SpecWarnVengefulShade		= "Show special warning when you are attacked by Vengeful Shade",--creatureid 38222
+	WeaponsStatus				= "Special warning at combat start if unequip/equip function is enabled",
 	ShieldHealthFrame			= "Show boss health with a health bar for $spell:70842",
-	WarnTouchInsignificance		= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(71204, GetSpellInfo(71204) or "unknown"),	
+	WarnTouchInsignificance		= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(71204, GetSpellInfo(71204) or "unknown"),
 	SetIconOnDominateMind		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(71289),
 	SetIconOnDeformedFanatic	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70900),
-	SetIconOnEmpoweredAdherent	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70901)
+	SetIconOnEmpoweredAdherent	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70901),
+	SoundWarnCountingMC			= "Play a 5 second audio countdown for Mind Control",
+	EqUneqWeapons				= "Unequip/equip weapons if MC is cast on you. For equipping to work, create an equipment set called 'pve'.",
+	EqUneqTimer					= "Remove weapons by timer ALWAYS, not on cast (if ping is high). The option above must be enabled.",
+	BlockWeapons				= "Completely block the unequip/equip functions above (off by default)",
+
 }
 
 L:SetMiscLocalization{
 	YellPull				= "What is this disturbance? You dare trespass upon this hallowed ground? This shall be your final resting place!",
 	YellReanimatedFanatic	= "Arise, and exult in your pure form!",
+	YellMC					= "You are weak, powerless to resist my will!",
 	ShieldPercent			= "Mana Barrier",--Translate Spell id 70842
 	Fanatic1				= "Cult Fanatic",
 	Fanatic2				= "Deformed Fanatic",
-	Fanatic3				= "Reanimated Fanatic"
+	Fanatic3				= "Reanimated Fanatic",
+	setMissing				= "ATTENTION! DBM automatic weapon unequipping/equipping will not work until you create a equipment set named pve"
 }
 
 ----------------------
@@ -187,11 +196,15 @@ L:SetTimerLocalization{
 
 L:SetMiscLocalization{
 	PullAlliance	= "Fire up the engines! We got a meetin' with destiny, lads!",
+	CombatAlliance	= "Cowardly dogs! Ye blindsided us!",
 	KillAlliance	= "Don't say I didn't warn ya, scoundrels! Onward, brothers and sisters!",
 	PullHorde		= "Rise up, sons and daughters of the Horde! Today we battle a hated enemy of the Horde! LOK'TAR OGAR!",
+	CombatHorde		= "ALLIANCE GUNSHIP! ALL HANDS ON DECK!",
 	KillHorde		= "The Alliance falter. Onward to the Lich King!",
 	AddsAlliance	= "Reavers, Sergeants, attack",
-	AddsHorde		= "Marines, Sergeants, attack"
+	AddsHorde		= "Marines, Sergeants, attack",
+	MageAlliance	= "We're taking hull damage, get a battle-mage out here to shut down those cannons!",
+	MageHorde		= "We're taking hull damage, get a sorcerer out here to shut down those cannons!"
 }
 
 -----------------------------
@@ -237,13 +250,13 @@ L:SetGeneralLocalization{
 
 L:SetWarningLocalization{
 	InhaledBlight		= "Inhaled Blight >%d<",
-	WarnGastricBloat	= "%s on >%s< (%d)",		-- Gastric Bloat on >args.destName< (args.amount)
+	WarnGastricBloat	= "%s on >%s< (%s)",		-- Gastric Bloat on >args.destName< (args.amount)
 }
 
 L:SetOptionLocalization{
 	InhaledBlight		= "Show warning for $spell:71912",
 	RangeFrame			= "Show range frame (8 yards)",
-	WarnGastricBloat	= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(72551, GetSpellInfo(72551) or "unknown"),	
+	WarnGastricBloat	= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(72551, GetSpellInfo(72551) or "unknown"),
 	SetIconOnGasSpore	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(69279),
 	AnnounceSporeIcons	= "Announce icons for $spell:69279 targets to raid chat\n(requires announce to be enabled and promoted status)",
 	AchievementCheck	= "Announce 'Flu Shot Shortage' achievement failure to raid\n(requires promoted status)"
@@ -300,7 +313,7 @@ L:SetGeneralLocalization{
 L:SetWarningLocalization{
 	WarnPhase2Soon				= "Phase 2 soon",
 	WarnPhase3Soon				= "Phase 3 soon",
-	WarnMutatedPlague			= "%s on >%s< (%d)",	-- Mutated Plague on >args.destName< (args.amount)
+	WarnMutatedPlague			= "%s on >%s< (%s)",	-- Mutated Plague on >args.destName< (args.amount)
 	SpecWarnMalleableGoo		= "Malleable Goo on you - Move away",
 	SpecWarnMalleableGooNear	= "Malleable Goo near you - Watch out",
 	SpecWarnUnboundPlague		= "Drop off the Unbound Plague",
@@ -369,7 +382,8 @@ L:SetMiscLocalization{
 	Keleseth			= "Prince Keleseth",
 	Taldaram			= "Prince Taldaram",
 	Valanar				= "Prince Valanar",
-	EmpoweredFlames		= "Empowered Flames speed toward (%S+)!"
+	EmpoweredFlames		= "Empowered Flames speed toward (%S+)!",
+	EmpoweredFlames2	= "Empowered Flames speed toward (%S+)!"
 }
 
 -----------------------------
@@ -410,30 +424,39 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-	WarnCorrosion	= "%s on >%s< (%d)",		-- Corrosion on >args.destName< (args.amount)
-	WarnPortalOpen	= "Portals open"
+	WarnPortalOpen	= "Portals open",
+	Suppressors		= "Suppressors"
 }
 
 L:SetTimerLocalization{
 	TimerPortalsOpen		= "Portals open",
+	TimerPortalsClose		= "Portals close",
 	TimerBlazingSkeleton	= "Next Blazing Skeleton",
-	TimerAbom				= "Next Abomination"
+	TimerAbom				= "Next Abomination",
+	TimerSuppressorOne			= "1st wave of Suppressors",
+	TimerSuppressorTwo			= "2nd wave of Suppressors",
+	TimerSuppressorThree		= "3rd wave of Suppressors",
+	TimerSuppressorFour			= "4th wave of Suppressors"
 }
 
 L:SetOptionLocalization{
 	SetIconOnBlazingSkeleton	= "Set icon on Blazing Skeleton (skull)",
 	WarnPortalOpen				= "Show warning when Nightmare Portals are opened up",
 	TimerPortalsOpen			= "Show timer when Nightmare Portals are opened up",
+	TimerPortalsClose			= "Show timer when Nightmare Portals are closed",
 	TimerBlazingSkeleton		= "Show timer for next Blazing Skeleton spawn",
 	TimerAbom					= "Show timer for next Gluttonous Abomination spawn (Experimental)",
-	WarnCorrosion				= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(70751, GetSpellInfo(70751) or "unknown")
+	Suppressors					= "Show special warning for new Suppressors",
+	TimerSuppressorOne			= "1st wave of Suppressors",
+	TimerSuppressorTwo			= "2nd wave of Suppressors",
+	TimerSuppressorThree		= "3rd wave of Suppressors",
+	TimerSuppressorFour			= "4th wave of Suppressors"
 }
 
 L:SetMiscLocalization{
 	YellPull		= "Intruders have breached the inner sanctum. Hasten the destruction of the green dragon! Leave only bones and sinew for the reanimation!",
 	YellKill		= "I AM RENEWED! Ysera grant me the favor to lay these foul creatures to rest!",
-	YellPortals		= "I have opened a portal into the Dream. Your salvation lies within, heroes...",
-	YellPhase2		= "My strength is returning. Press on, heroes!"--Need to confirm this is when adds spawn faster (phase 2) before used in mod
+	YellPortals		= "I have opened a portal into the Dream. Your salvation lies within, heroes..."
 }
 
 ------------------
@@ -539,13 +562,18 @@ L:SetOptionLocalization{
 	RagingSpiritIcon		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(69200),
 	TrapIcon				= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(73539),
 	HarvestSoulIcon			= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(74327),
-	ValkyrIcon				= "Set icons on Valkyrs",
+	ValkyrIcon				= "Set icons on Val'Kyrs",
 	DefileArrow				= "Show DBM arrow when $spell:72762 is near you",
 	TrapArrow				= "Show DBM arrow when $spell:73539 is near you",
 	LKBugWorkaround			= "Don't use latency based sync check for defile/shadow trap\n(Default on until a bug in sync check is worked out)",
 	AnnounceValkGrabs		= "Announce Val'kyr Shadowguard grab targets to raid chat\n(requires announce to be enabled and promoted status)",
 	SpecWarnValkyrLow		= "Show special warning when Valkyr is below 55% HP",
-	AnnouncePlagueStack		= "Announce $spell:73912 stacks to raid (10 stacks, every 5 after 10)\n(requires promoted status)"
+	AnnouncePlagueStack		= "Announce $spell:73912 stacks to raid (10 stacks, every 5 after 10)\n(requires promoted status)",
+	ShowFrame				= "Show Val'Kyr Targets frame",
+	FrameClassColor			= "Use Class Colors in Val'Kyr Targets frame",
+	FrameUpwards 			= "Expand Val'Kyr target frame upwards",
+	FrameLocked				= "Lock Val'Kyr Targets frame",
+	RemoveBOP				= "Remove Hand of Protection and Divine Shield before exiting Frostmourne room"
 }
 
 L:SetMiscLocalization{
@@ -558,5 +586,11 @@ L:SetMiscLocalization{
 	ValkGrabbedIcon			= "Valkyr Shadowguard {rt%d} grabbed %s",
 	ValkGrabbed				= "Valkyr Shadowguard grabbed %s",
 	PlagueStackWarning		= "Warning: %s has %d stacks of Necrotic Plague",
-	AchievementCompleted	= ">> ACHIEVEMENT COMPLETE: %s has %d stacks of Necrotic Plague <<"
+	AchievementCompleted	= ">> ACHIEVEMENT COMPLETE: %s has %d stacks of Necrotic Plague <<",
+	FrameTitle				= "Valkyr targets",
+	FrameLock				= "Frame Lock",
+	FrameClassColor			= "Use Class Colors",
+	FrameOrientation		= "Expand upwards",
+	FrameHide				= "Hide Frame",
+	FrameClose				= "Close"
 }

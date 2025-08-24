@@ -5,7 +5,7 @@ mod:SetRevision(("$Revision: 4181 $"):sub(12, -3))
 
 mod:SetCreatureID(33113)
 
-mod:RegisterCombat("yell", L.YellPull)
+mod:RegisterCombat("yell", L.YellPull, L.YellPull2)
 
 mod:RegisterEvents(
 	"SPELL_AURA_REMOVED",
@@ -23,9 +23,20 @@ local warnWardofLife		= mod:NewSpecialWarning("warnWardofLife")
 
 local timerSystemOverload	= mod:NewBuffActiveTimer(20, 62475)
 local timerFlameVents		= mod:NewCastTimer(10, 62396)
-local timerPursued			= mod:NewTargetTimer(30, 62374)
 
-local soundPursued = mod:NewSound(62374)
+local timerNextFlameVents = nil
+
+local timerPursued			= mod:NewTargetTimer(30, 62374, nil, nil, nil, 2, nil, DBM_CORE_DEADLY_ICON, nil, 3)
+
+local soundPursued			= mod:NewSound(62374)
+
+if mod:IsDifficulty("heroic10") then
+	timerNextFlameVents	= mod:NewNextTimer(20, 62396)
+else
+	timerNextFlameVents	= mod:NewNextTimer(20, 62396) -- im leaving this split because it keeps changing every week
+end
+
+
 
 local guids = {}
 local function buildGuidTable()
@@ -37,10 +48,15 @@ end
 
 function mod:OnCombatStart(delay)
 	buildGuidTable()
+	if mod:IsDifficulty("heroic10") then
+		timerNextFlameVents:Start(20)
+	else
+		timerNextFlameVents:Start(30)
+	end
 end
 
 function mod:SPELL_SUMMON(args)
-	if args:IsSpellID(62907) then		-- Ward of Life spawned (Creature id: 34275)
+	if args:IsSpellID(62907) and self:AntiSpam(5, "warnWardofLife") then		-- Ward of Life spawned (Creature id: 34275)
 		warnWardofLife:Show()
 	end
 end
@@ -48,9 +64,16 @@ end
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(62396) then		-- Flame Vents
 		timerFlameVents:Start()
+		timerNextFlameVents:Start()
 
 	elseif args:IsSpellID(62475) then	-- Systems Shutdown / Overload
 		timerSystemOverload:Start()
+		timerNextFlameVents:Stop()
+		if mod:IsDifficulty("heroic10") then
+			timerNextFlameVents:Start(40)
+		else
+			timerNextFlameVents:Start(50)
+		end
 		warnSystemOverload:Show()
 
 	elseif args:IsSpellID(62374) then	-- Pursued

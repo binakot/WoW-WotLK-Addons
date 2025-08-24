@@ -9,6 +9,7 @@ mod:RegisterCombat("yell", L.YellPull)
 mod:RegisterEvents(
 	"SPELL_AURA_APPLIED",
 	"SPELL_AURA_APPLIED_DOSE",
+	"SPELL_CAST_SUCCESS",
 	"SPELL_AURA_REMOVED",
 	"SPELL_CAST_START",
 	"SPELL_INTERRUPT",
@@ -21,7 +22,7 @@ mod:RegisterEvents(
 local canPurge = select(2, UnitClass("player")) == "MAGE"
 			or select(2, UnitClass("player")) == "SHAMAN"
 			or select(2, UnitClass("player")) == "PRIEST"
-
+local isHunter = select(2, UnitClass("player")) == "HUNTER"
 local warnAddsSoon					= mod:NewAnnounce("WarnAddsSoon", 2)
 local warnDominateMind				= mod:NewTargetAnnounce(71289, 3)
 local warnDeathDecay				= mod:NewSpellAnnounce(72108, 2)
@@ -29,53 +30,79 @@ local warnSummonSpirit				= mod:NewSpellAnnounce(71426, 2)
 local warnReanimating				= mod:NewAnnounce("WarnReanimating", 3)
 local warnDarkTransformation		= mod:NewSpellAnnounce(70900, 4)
 local warnDarkEmpowerment			= mod:NewSpellAnnounce(70901, 4)
-local warnPhase2					= mod:NewPhaseAnnounce(2, 1)	
-local warnFrostbolt					= mod:NewCastAnnounce(72007, 2)
-local warnTouchInsignificance		= mod:NewAnnounce("WarnTouchInsignificance", 2, 71204, mod:IsTank() or mod:IsHealer())
+local warnPhase2					= mod:NewPhaseAnnounce(2, 1)
+local warnFrostbolt					= mod:NewCastAnnounce(72007, 2, 2, nil, "Tank")
 local warnDarkMartyrdom				= mod:NewSpellAnnounce(72499, 4)
+local warnTouchInsignificance		= mod:NewStackAnnounce(71204, 2, nil, true)
 
-local specWarnCurseTorpor			= mod:NewSpecialWarningYou(71237)
-local specWarnDeathDecay			= mod:NewSpecialWarningMove(72108)
-local specWarnTouchInsignificance	= mod:NewSpecialWarningStack(71204, nil, 3)
-local specWarnVampricMight			= mod:NewSpecialWarningDispel(70674, canPurge)
-local specWarnDarkMartyrdom			= mod:NewSpecialWarningMove(72499, mod:IsMelee())
-local specWarnFrostbolt				= mod:NewSpecialWarningInterupt(72007, false)
-local specWarnVengefulShade			= mod:NewSpecialWarning("SpecWarnVengefulShade", not mod:IsTank())
+local specWarnCurseTorpor			= mod:NewSpecialWarningYou(71237, nil, nil, nil, 1, 2)
+local specWarnDeathDecay			= mod:NewSpecialWarningMove(72108, nil, nil, nil, 1, 2)
+local specWarnTouchInsignificance	= mod:NewSpecialWarningStack(71204, nil, 3, nil, nil, 1, 6)
+local specWarnVampricMight			= mod:NewSpecialWarningDispel(70674, "MagicDispeller", nil, nil, 1, 2)
+local specWarnDarkMartyrdom			= mod:NewSpecialWarningRun(72499, "Melee", nil, nil, 4, 2)
+local specWarnFrostbolt				= mod:NewSpecialWarningInterrupt(72007, nil, false, 2, 1, 2) -- HasInterrupt?
+local specWarnVengefulShade			= mod:NewSpecialWarning("SpecWarnVengefulShade", "-Tank")
+local specWarnWeapons				= mod:NewSpecialWarning("WeaponsStatus", false)
 
-local timerAdds						= mod:NewTimer(60, "TimerAdds", 61131)
+local timerAdds						= mod:NewTimer(45, "TimerAdds", 61131, nil, nil, 1, DBM_CORE_TANK_ICON..DBM_CORE_DAMAGE_ICON)
 local timerDominateMind				= mod:NewBuffActiveTimer(12, 71289)
-local timerDominateMindCD			= mod:NewCDTimer(40, 71289)
-local timerSummonSpiritCD			= mod:NewCDTimer(10, 71426, nil, false)
-local timerFrostboltCast			= mod:NewCastTimer(4, 72007)
-local timerTouchInsignificance		= mod:NewTargetTimer(30, 71204, nil, mod:IsTank() or mod:IsHealer())
+local timerDominateMindCD			= mod:NewCDTimer(40, 71289, nil, nil, nil, 3)
+local timerSummonSpiritCD			= mod:NewCDTimer(10, 71426, nil, true, 2)
+local timerFrostboltCast			= mod:NewCastTimer(2, 72007, nil, "Tank")
+local timerTouchInsignificance		= mod:NewTargetTimer(30, 71204, nil, "Tank|Healer", nil, 5)
 
 local berserkTimer					= mod:NewBerserkTimer(600)
+local soundWarnSpirit				= mod:NewSound(71426)
+local soundWarnMC					= mod:NewSound5(71289)
 
 mod:AddBoolOption("SetIconOnDominateMind", true)
 mod:AddBoolOption("SetIconOnDeformedFanatic", true)
 mod:AddBoolOption("SetIconOnEmpoweredAdherent", false)
 mod:AddBoolOption("ShieldHealthFrame", true, "misc")
 mod:RemoveOption("HealthFrame")
+mod:AddBoolOption("EqUneqWeapons", (mod:IsWeaponDependent() or isHunter) and not mod:IsTank() and (mod:IsDifficulty("heroic10") or mod:IsDifficulty("heroic25")))
+mod:AddBoolOption("EqUneqTimer", false)
+mod:AddBoolOption("BlockWeapons", false)
 
+if mod.Options.EqUneqWeapons and (mod:IsWeaponDependent() or isHunter) and not mod:IsTank() and (mod:IsDifficulty("heroic10") or mod:IsDifficulty("heroic25")) and not mod:IsEquipmentSetAvailable("pve") then
+	for i = 1, select("#", GetFramesRegisteredForEvent("CHAT_MSG_RAID_WARNING")) do
+		local frame = select(i, GetFramesRegisteredForEvent("CHAT_MSG_RAID_WARNING"))
+		if frame.AddMessage then
+			mod:Schedule(10, frame.AddMessage, frame, L.setMissing)
+		end
+	end
+	mod:Schedule(10, RaidNotice_AddMessage, RaidWarningFrame, L.setMissing, ChatTypeInfo["RAID_WARNING"])
+end
 
 local lastDD	= 0
 local dominateMindTargets	= {}
 local dominateMindIcon 	= 6
 local deformedFanatic
 local empoweredAdherent
+local dtime = 0
+local lastMc = 0
+local UnitGUID = UnitGUID
 
 function mod:OnCombatStart(delay)
+	self:SetStage(1)
+	dtime = 0
+	lastMc = 0
 	if self.Options.ShieldHealthFrame then
 		DBM.BossHealth:Show(L.name)
 		DBM.BossHealth:AddBoss(36855, L.name)
 		self:ScheduleMethod(0.5, "CreateShildHPFrame")
-	end		
+	end
 	berserkTimer:Start(-delay)
 	timerAdds:Start(7)
 	warnAddsSoon:Schedule(4)			-- 3sec pre-warning on start
 	self:ScheduleMethod(7, "addsTimer")
 	if not mod:IsDifficulty("normal10") then
 		timerDominateMindCD:Start(30)		-- Sometimes 1 fails at the start, then the next will be applied 70 secs after start ?? :S
+		soundWarnMC:Schedule(25)
+		if mod.Options.EqUneqWeapons and not mod:IsTank() and mod.Options.EqUneqTimer then
+			specWarnWeapons:Show()
+			mod:ScheduleMethod(29, "UnW")
+		end
 	end
 	table.wipe(dominateMindTargets)
 	dominateMindIcon = 6
@@ -85,24 +112,38 @@ end
 
 function mod:OnCombatEnd()
 	DBM.BossHealth:Clear()
+	self:UnscheduleMethod("UnW")
+	self:UnscheduleMethod("EqW")
+	soundWarnMC:Cancel()
 end
 
 do	-- add the additional Shield Bar
 	local last = 100
 	local function getShieldPercent()
-		local guid = UnitGUID("focus")
-		if mod:GetCIDFromGUID(guid) == 36855 then 
-			last = math.floor(UnitMana("focus")/UnitManaMax("focus") * 100)
+
+		local unitId = "boss1"
+		local guid = UnitGUID(unitId)
+		if mod:GetCIDFromGUID(guid) == 36855 then
+			last = math.floor(UnitMana(unitId)/UnitManaMax(unitId) * 100)
 			return last
 		end
+
+		unitId = "boss1"
+		guid = UnitGUID(unitId)
+		if mod:GetCIDFromGUID(guid) == 36855 then
+			last = math.floor(UnitMana(unitId)/UnitManaMax(unitId) * 100)
+			return last
+		end
+
 		for i = 0, GetNumRaidMembers(), 1 do
-			local unitId = ((i == 0) and "target") or "raid"..i.."target"
-			local guid = UnitGUID(unitId)
+			unitId = ((i == 0) and "target") or ("raid"..i.."target")
+			guid = UnitGUID(unitId)
 			if mod:GetCIDFromGUID(guid) == 36855 then
 				last = math.floor(UnitMana(unitId)/UnitManaMax(unitId) * 100)
 				return last
 			end
 		end
+
 		return last
 	end
 	function mod:CreateShildHPFrame()
@@ -110,17 +151,37 @@ do	-- add the additional Shield Bar
 	end
 end
 
-function mod:addsTimer()
+function mod:addsTimer()  -- Edited add spawn timers, working for heroic mode
 	timerAdds:Cancel()
 	warnAddsSoon:Cancel()
-	if mod:IsDifficulty("heroic10") or mod:IsDifficulty("heroic25") then
+	if self:IsDifficulty("normal10") or self:IsDifficulty("normal25") then
 		warnAddsSoon:Schedule(40)	-- 5 secs prewarning
 		self:ScheduleMethod(45, "addsTimer")
 		timerAdds:Start(45)
 	else
-		warnAddsSoon:Schedule(55)	-- 5 secs prewarning
-		self:ScheduleMethod(60, "addsTimer")
-		timerAdds:Start()
+		warnAddsSoon:Schedule(40)	-- 5 secs prewarning
+		self:ScheduleMethod(45, "addsTimer")
+		timerAdds:Start(45)
+	end
+end
+
+function mod:UnW()
+   if self:IsWeaponDependent() and self.Options.EqUneqWeapons and not self.Options.BlockWeapons and not self:IsTank() and self:IsEquipmentSetAvailable("pve") then
+        PickupInventoryItem(16)
+        PutItemInBackpack()
+        PickupInventoryItem(17)
+        PutItemInBackpack()
+    elseif isHunter and self.Options.EqUneqWeapons and not self.Options.BlockWeapons and not self:IsTank() and self:IsEquipmentSetAvailable("pve") then
+        PickupInventoryItem(18)
+        PutItemInBackpack()
+    end
+end
+
+function mod:EqW()
+	if self.Options.EqUneqWeapons and not self.Options.BlockWeapons and not self:IsTank() and self:IsEquipmentSetAvailable("pve") then
+		DBM:Debug("trying to equip pve",1)
+		UseEquipmentSet("pve")
+		CancelUnitBuff("player", (GetSpellInfo(25780)))
 	end
 end
 
@@ -141,15 +202,54 @@ function mod:TrySetTarget()
 	end
 end
 
+function mod:has_value(tab, val)
+    for index, value in ipairs(tab) do
+        if value == val then
+            return true
+        end
+    end
+    return false
+end
+
+function mod:SPELL_CAST_SUCCESS(args)
+	if args.spellId == 71289 then
+		timerDominateMindCD:Start()
+		DBM:Debug("MC on "..args.destName,2)
+		if self.Options.EqUneqWeapons and args.destName == UnitName("player") then
+			self:UnW()
+			self:UnW()
+			self:ScheduleMethod(0.01, "UnW")
+			DBM:Debug("Unequipping",2)
+		end
+	end
+end
+
 do
-	local function showDominateMindWarning()
+	local function showDominateMindWarning(mc_delay)
+		if not mc_delay then
+			mc_delay = 0
+		end
 		warnDominateMind:Show(table.concat(dominateMindTargets, "<, >"))
 		timerDominateMind:Start()
-		timerDominateMindCD:Start()
+		timerDominateMindCD:Start(40-mc_delay)
+		if (not mod:has_value(dominateMindTargets,UnitName("player")) and mod.Options.EqUneqWeapons and not mod:IsTank()) then
+			DBM:Debug("Equipping scheduled",1)
+	        mod:ScheduleMethod(0.1, "EqW")
+	        mod:ScheduleMethod(1.7, "EqW")
+			mod:ScheduleMethod(3.3, "EqW")
+			mod:ScheduleMethod(5.5, "EqW")
+			mod:ScheduleMethod(7.5, "EqW")
+			mod:ScheduleMethod(9.9, "EqW")
+		end
 		table.wipe(dominateMindTargets)
 		dominateMindIcon = 6
+		soundWarnMC:Cancel()
+		soundWarnMC:Schedule(35-mc_delay)
+		if mod.Options.EqUneqWeapons and not mod:IsTank() and mod.Options.EqUneqTimer then
+			mod:ScheduleMethod(39-mc_delay, "UnW")
+		end
 	end
-	
+
 	function mod:SPELL_AURA_APPLIED(args)
 		if args:IsSpellID(71289) then
 			dominateMindTargets[#dominateMindTargets + 1] = args.destName
@@ -158,10 +258,16 @@ do
 				dominateMindIcon = dominateMindIcon - 1
 			end
 			self:Unschedule(showDominateMindWarning)
+			if lastMc > 0 then
+				dtime = GetTime() - lastMc
+			end
+			if dtime < 0 then
+				dtime = 0
+			end
 			if mod:IsDifficulty("heroic10") or mod:IsDifficulty("normal25") or (mod:IsDifficulty("heroic25") and #dominateMindTargets >= 3) then
-				showDominateMindWarning()
+				showDominateMindWarning(dtime)
 			else
-				self:Schedule(0.9, showDominateMindWarning)
+				self:Schedule(0.9, showDominateMindWarning, dtime)
 			end
 		elseif args:IsSpellID(71001, 72108, 72109, 72110) then
 			if args:IsPlayer() then
@@ -176,7 +282,7 @@ do
 		elseif args:IsSpellID(70674) and not args:IsDestTypePlayer() and (UnitName("target") == L.Fanatic1 or UnitName("target") == L.Fanatic2 or UnitName("target") == L.Fanatic3) then
 			specWarnVampricMight:Show(args.destName)
 		elseif args:IsSpellID(71204) then
-			warnTouchInsignificance:Show(args.spellName, args.destName, args.amount or 1)
+			warnTouchInsignificance:Show(args.destName, args.amount or 1)
 			timerTouchInsignificance:Start(args.destName)
 			if args:IsPlayer() and (args.amount or 1) >= 3 and (mod:IsDifficulty("normal10") or mod:IsDifficulty("normal25")) then
 				specWarnTouchInsignificance:Show(args.amount)
@@ -190,11 +296,21 @@ end
 
 function mod:SPELL_AURA_REMOVED(args)
 	if args:IsSpellID(70842) then
+		self:SetStage(2)
 		warnPhase2:Show()
 		if mod:IsDifficulty("normal10") or mod:IsDifficulty("normal25") then
 			timerAdds:Cancel()
 			warnAddsSoon:Cancel()
 			self:UnscheduleMethod("addsTimer")
+		end
+    elseif args:IsSpellID(71289) then
+		if (args.destName == UnitName("player") or args:IsPlayer()) and self.Options.EqUneqWeapons and not mod:IsTank() then
+	        self:ScheduleMethod(0.1, "EqW")
+	        self:ScheduleMethod(1.7, "EqW")
+	        self:ScheduleMethod(3.3, "EqW")
+			self:ScheduleMethod(5.0, "EqW")
+			self:ScheduleMethod(8.0, "EqW")
+			self:ScheduleMethod(9.9, "EqW")
 		end
 	end
 end
@@ -202,6 +318,8 @@ end
 function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(71420, 72007, 72501, 72502) then
 		warnFrostbolt:Show()
+		--specWarnFrostbolt:Show(args.sourceName)
+		--specWarnFrostbolt:Play("kickcast")
 		timerFrostboltCast:Start()
 	elseif args:IsSpellID(70900) then
 		warnDarkTransformation:Show()
@@ -227,14 +345,11 @@ function mod:SPELL_INTERRUPT(args)
 	end
 end
 
-local lastSpirit = 0
 function mod:SPELL_SUMMON(args)
-	if args:IsSpellID(71426) then -- Summon Vengeful Shade
-		if time() - lastSpirit > 5 then
-			warnSummonSpirit:Show()
-			timerSummonSpiritCD:Start()
-			lastSpirit = time()
-		end
+	if args:IsSpellID(71426) and self:AntiSpam(5, 1) then -- Summon Vengeful Shade
+		warnSummonSpirit:Show()
+		timerSummonSpiritCD:Start()
+		soundWarnSpirit:Play("Interface\\AddOns\\DBM-Core\\sounds\\beware.ogg")
 	end
 end
 
@@ -253,5 +368,8 @@ end
 function mod:CHAT_MSG_MONSTER_YELL(msg)
 	if msg == L.YellReanimatedFanatic or msg:find(L.YellReanimatedFanatic) then
 		warnReanimating:Show()
+	elseif (msg == L.YellMC or msg:find(L.YellMC)) then
+		lastMc = GetTime()
+		timerDominateMindCD:Start()
 	end
 end

@@ -19,9 +19,12 @@ local warnInjection		= mod:NewTargetAnnounce(28169, 2)
 local warnCloud			= mod:NewSpellAnnounce(28240, 2)
 
 local specWarnInjection	= mod:NewSpecialWarning("SpecialWarningInjection")
+local yellInjection		= mod:NewYellMe(28169)
+local yellInjectionCount= mod:NewShortFadesYell(28169)
 
 local timerInjection	= mod:NewTargetTimer(10, 28169)
 local timerCloud		= mod:NewNextTimer(15, 28240)
+local soundCloud		= mod:NewSound3(28240, nil, mod:IsMelee() or mod:IsTank())
 local enrageTimer		= mod:NewBerserkTimer(720)
 
 mod:AddBoolOption("SetIconOnInjectionTarget", true)
@@ -62,12 +65,14 @@ function mod:SPELL_AURA_APPLIED(args)
 		timerInjection:Start(args.destName)
 		if args:IsPlayer() then
 			specWarnInjection:Show()
+			yellInjection:Yell()
+			yellInjectionCount:Countdown(28169, 5)
 		end
 		if self.Options.SetIconOnInjectionTarget then
 			table.insert(mutateIcons, args.destName)
 			addIcon()
 		end
-	end	
+	end
 end
 
 function mod:SPELL_AURA_REMOVED(args)
@@ -83,5 +88,6 @@ function mod:SPELL_CAST_SUCCESS(args)
 	if args:IsSpellID(28240) then
 		warnCloud:Show()
 		timerCloud:Start()
-	end	
+		soundCloud:Schedule(15-3)
+	end
 end

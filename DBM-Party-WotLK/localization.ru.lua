@@ -1,9 +1,9 @@
-﻿if GetLocale() ~= "ruRU" then return end
+if GetLocale() ~= "ruRU" then return end
 
 local L
 
-local spell				= "%s"				
-local debuff			= "%s: >%s<"			
+local spell				= "%s"
+local debuff			= "%s: >%s<"
 local spellCD			= "Восстановление %s"
 local spellSoon			= "Скоро %s"
 local optionWarning		= "Предупреждение для %s"
@@ -329,7 +329,8 @@ L:SetMiscLocalization({
 	YellPull		= "Вам холодно? Это дыхание скорой смерти.",
 	HandlerYell		= "Защищайте меня! Быстрее, будьте вы прокляты!",
 	Phase2			= "Неужели вы не понимаете всей бесполезности происходящего?",
-	YellKill		= "Ваши усилия… напрасны."
+	YellKill		= "Ваши усилия… напрасны.",
+	SetIconOnEnragedMob = DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(39249)
 })
 
 -----------------
@@ -407,7 +408,7 @@ L:SetOptionLocalization({
 })
 
 -------------------------
---  Drakkari Colossus  --		
+--  Drakkari Colossus  --
 -------------------------
 L = DBM:GetModLocalization("BloodstoneAnnihilator")
 
@@ -438,12 +439,18 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
+	TimerPhase2		= "Фаза Носорога",
+	TimerPhase1		= "Фаза Тролля"
 })
 
 L:SetTimerLocalization({
+	TimerPhase2		= "Фаза Носорога",
+	TimerPhase1		= "Фаза Тролля"
 })
 
 L:SetOptionLocalization({
+	TimerPhase2		= "Предупреждение для фазы Носорога",
+	TimerPhase1		= "Предупреждение для фазы Тролля"
 })
 
 -------------------------
@@ -695,7 +702,7 @@ L:SetOptionLocalization({
 L:SetMiscLocalization({
 	SplitTrigger1		= "Меня на вас хватит!",
 	SplitTrigger2		= "Вы получите больше, чем заслуживаете!",
-	MergeTrigger		= "Ну а теперь, покончим с этим!"	
+	MergeTrigger		= "Ну а теперь, покончим с этим!"
 })
 
 -------------------
@@ -879,12 +886,14 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
+	SpecWarnSpecial	= "Кольцо Тьмы - прячьтесь за колоннами!"
 })
 
 L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
+	SpecWarnSpecial	= "Спец-предупреждение для Кольца Тьмы (спрятаться за колоннами)",
 })
 
 L:SetMiscLocalization({
@@ -1130,7 +1139,7 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization({
-	TimerPortalIn	= "Портал #%d" , 
+	TimerPortalIn	= "Портал #%d" ,
 })
 
 L:SetOptionLocalization({
@@ -1214,7 +1223,7 @@ L:SetOptionLocalization({
 })
 
 L:SetMiscLocalization({
-	YellCombatEnd	= "Отличная работа!"
+	YellCombatEnd	= "Превосходно!"
 })
 
 -----------------------

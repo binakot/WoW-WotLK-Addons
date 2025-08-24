@@ -1,7 +1,7 @@
 local L
 
-local spell				= "%s"				
-local debuff			= "%s: >%s<"			
+local spell				= "%s"
+local debuff			= "%s: >%s<"
 local spellCD			= "%s cooldown"					-- translate
 local spellSoon			= "%s soon"						-- translate
 local optionWarning		= "Show warning for %s"			-- translate
@@ -327,7 +327,8 @@ L:SetMiscLocalization({
 	YellPull		= "The chill you feel is the herald of your doom!",
 	HandlerYell		= "Bolster my defenses! Hurry, curse you!",
 	Phase2			= "Surely you can see the futility of it all!",
-	YellKill		= "Your efforts... are in vain."
+	YellKill		= "Your efforts... are in vain.",
+	SetIconOnEnragedMob = DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(39249)
 })
 
 -----------------
@@ -405,7 +406,7 @@ L:SetOptionLocalization({
 })
 
 -------------------------
---  Drakkari Colossus  --		
+--  Drakkari Colossus  --
 -------------------------
 L = DBM:GetModLocalization("BloodstoneAnnihilator")
 
@@ -436,12 +437,18 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
+	TimerPhase2		= "Rhino phase",
+	TimerPhase1		= "Troll phase"
 })
 
 L:SetTimerLocalization({
+	TimerPhase2		= "Rhino phase",
+	TimerPhase1		= "Troll phase"
 })
 
 L:SetOptionLocalization({
+	TimerPhase2		= "Show warning for Rhino phase",
+	TimerPhase1		= "Show warning for Troll phase"
 })
 
 -------------------------
@@ -877,12 +884,14 @@ L:SetGeneralLocalization({
 })
 
 L:SetWarningLocalization({
+	SpecWarnSpecial	= "Shadow Nova - Hide Behind Pillars"
 })
 
 L:SetTimerLocalization({
 })
 
 L:SetOptionLocalization({
+	SpecWarnSpecial	= "Show special warning on Shadow Nova cast to hide",
 })
 
 L:SetMiscLocalization({
@@ -1128,7 +1137,7 @@ L:SetWarningLocalization({
 })
 
 L:SetTimerLocalization({
-	TimerPortalIn	= "Portal #%d", 
+	TimerPortalIn	= "Portal #%d",
 })
 
 L:SetOptionLocalization({

@@ -20,11 +20,12 @@ local warnGravityBomb				= mod:NewTargetAnnounce(64234, 3)
 local specWarnLightBomb				= mod:NewSpecialWarningYou(65121)
 local specWarnGravityBomb			= mod:NewSpecialWarningYou(64234)
 local specWarnConsumption			= mod:NewSpecialWarningMove(64206)--Hard mode void zone dropped by Gravity Bomb
+local yellGravityBomb				= mod:NewShortFadesYell(64234)
 
-local enrageTimer					= mod:NewBerserkTimer(600)
+local enrageTimer					= mod:NewBerserkTimer(360)
 local timerTympanicTantrumCast		= mod:NewCastTimer(62776)
 local timerTympanicTantrum			= mod:NewBuffActiveTimer(8, 62776)
-local timerTympanicTantrumCD		= mod:NewCDTimer(60, 62776)
+local timerTympanicTantrumCD		= mod:NewCDTimer(60, 62776, nil, nil, nil, 2, nil, DBM_CORE_DEADLY_ICON, nil, 3)
 local timerHeart					= mod:NewCastTimer(30, 63849)
 local timerLightBomb				= mod:NewTargetTimer(9, 65121)
 local timerGravityBomb				= mod:NewTargetTimer(9, 64234)
@@ -32,6 +33,7 @@ local timerAchieve					= mod:NewAchievementTimer(205, 2937, "TimerSpeedKill")
 
 mod:AddBoolOption("SetIconOnLightBombTarget", true)
 mod:AddBoolOption("SetIconOnGravityBombTarget", true)
+mod:AddBoolOption("RangeFrame", true)
 
 function mod:OnCombatStart(delay)
 	enrageTimer:Start(-delay)
@@ -39,7 +41,17 @@ function mod:OnCombatStart(delay)
 	if mod:IsDifficulty("heroic10") then
 		timerTympanicTantrumCD:Start(35-delay)
 	else
-		timerTympanicTantrumCD:Start(50-delay)
+		timerTympanicTantrumCD:Start(60-delay)
+	end
+
+	if self.Options.RangeFrame then
+		DBM.RangeCheck:Show(12)
+	end
+end
+
+function mod:OnCombatEnd()
+	if self.Options.RangeFrame then
+		DBM.RangeCheck:Hide()
 	end
 end
 
@@ -73,8 +85,11 @@ function mod:SPELL_AURA_APPLIED(args)
 		end
 		warnGravityBomb:Show(args.destName)
 		timerGravityBomb:Start(args.destName)
+		yellGravityBomb:Countdown(9, 5)
 	elseif args:IsSpellID(63849) then
+		timerTympanicTantrumCD:Stop()
 		timerHeart:Start()
+		timerTympanicTantrumCD:Start(65) -- maybe?
 	end
 end
 
@@ -90,7 +105,7 @@ function mod:SPELL_AURA_REMOVED(args)
 	end
 end
 
-do 
+do
 	local lastConsumption = 0
 	function mod:SPELL_DAMAGE(args)
 		if args:IsSpellID(64208, 64206) and args:IsPlayer() and time() - lastConsumption > 2 then		-- Hard mode void zone

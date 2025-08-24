@@ -20,7 +20,7 @@ local timerMirroredSoul			= mod:NewTargetTimer(8, 69051)
 local timerUnleashedSouls		= mod:NewBuffActiveTimer(5, 68939)
 local specwarnMirroredSoul		= mod:NewSpecialWarning("specwarnMirroredSoul")
 local specwarnWailingSouls		= mod:NewSpecialWarning("specwarnWailingSouls")
-local specwarnPhantomBlast		= mod:NewSpecialWarningInterupt(68982, false)
+local specwarnPhantomBlast		= mod:NewSpecialWarningInterrupt(68982, false)
 
 mod:AddBoolOption("SetIconOnMirroredTarget", true)
 
@@ -43,9 +43,9 @@ function mod:SPELL_AURA_APPLIED(args)
 		warnMirroredSoul:Show(args.destName)
 		timerMirroredSoul:Show(args.destName)
 		specwarnMirroredSoul:Show()
-		if self.Options.SetIconOnMirroredTarget then 
-			self:SetIcon(args.destName, 8, 8) 
-		end 
+		if self.Options.SetIconOnMirroredTarget then
+			self:SetIcon(args.destName, 8, 8)
+		end
 	elseif args:IsSpellID(68939) then							-- Unleashed Souls
 		timerUnleashedSouls:Start()
 	end

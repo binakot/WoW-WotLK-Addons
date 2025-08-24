@@ -26,6 +26,9 @@ local timerNextShift		= mod:NewNextTimer(30, 28089)
 local timerShiftCast		= mod:NewCastTimer(3, 28089)
 local timerThrow			= mod:NewNextTimer(20.6, 28338)
 
+local soundShiftWarn		= mod:NewSound(28089)
+local soundShift3			= mod:NewSound3(28089)
+
 mod:AddBoolOption("ArrowsEnabled", false, "Arrows")
 mod:AddBoolOption("ArrowsRightLeft", false, "Arrows")
 mod:AddBoolOption("ArrowsInverse", false, "Arrows")
@@ -37,11 +40,10 @@ mod:SetBossHealthInfo(
 )
 
 local currentCharge
-local phase2
 local down = 0
 
 function mod:OnCombatStart(delay)
-	phase2 = false
+	self:SetStage(1)
 	currentCharge = nil
 	down = 0
 	self:ScheduleMethod(20.6 - delay, "TankThrow")
@@ -52,16 +54,18 @@ end
 local lastShift = 0
 function mod:SPELL_CAST_START(args)
 	if args:IsSpellID(28089) then
-		phase2 = true
+		self:SetStage(2)
 		timerNextShift:Start()
+		soundShift3:Schedule(27)
 		timerShiftCast:Start()
+		soundShiftWarn:Play("Interface\\AddOns\\DBM-Core\\sounds\\beware.ogg")
 		warnShiftCasting:Show()
 		lastShift = GetTime()
 	end
 end
 
 function mod:UNIT_AURA(elapsed)
-	if not phase2 or (GetTime() - lastShift) > 5 or (GetTime() - lastShift) < 3 then return end
+	if self.vb.phase ~= 2 or (GetTime() - lastShift) > 5 or (GetTime() - lastShift) < 3 then return end
 	local charge
 	local i = 1
 	while UnitDebuff("player", i) do
@@ -103,7 +107,7 @@ function mod:UNIT_AURA(elapsed)
 end
 
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
-	if msg == L.Emote or msg == L.Emote2 then
+	if msg:match(L.Emote) or msg:match(L.Emote2) or msg:find(L.Emote) or msg:find(L.Emote2) or msg == L.Emote or msg == L.Emote2 then
 		down = down + 1
 		if down >= 2 then
 			self:UnscheduleMethod("TankThrow")
@@ -116,7 +120,7 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
 end
 
 function mod:TankThrow()
-	if not self:IsInCombat() or phase2 then
+	if not self:IsInCombat() or self.vb.phase == 2 then
 		DBM.BossHealth:Hide()
 		return
 	end

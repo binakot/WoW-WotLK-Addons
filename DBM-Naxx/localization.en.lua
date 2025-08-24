@@ -152,6 +152,7 @@ L:SetGeneralLocalization({
 })
 
 L:SetOptionLocalization({
+	RemoveHealthBuffsOnCombatStart	= "Remove HP buffs at start of the encounter",
 	WarningHateful	= "Post Hateful Strike targets to raid chat\n(requires announce to be enabled and leader/promoted status)"
 })
 
@@ -215,7 +216,8 @@ L:SetOptionLocalization({
 	WarningChargeNotChanged	= "Show special warning when your polarity did not change",
 	ArrowsEnabled			= "Show arrows (normal \"2 camp\" strategy)",
 	ArrowsRightLeft			= "Show left/right arrows for the \"4 camp\" strategy (show left arrow if polarity changed, right if not)",
-	ArrowsInverse			= "Inverse \"4 camp\" strategy (show right arrow if polarity changed, left if not)"
+	ArrowsInverse			= "Inverse \"4 camp\" strategy (show right arrow if polarity changed, left if not)",
+	SoundWarnCountingShift	= "Play a 5 second audio countdown for Polarity Shift"
 })
 
 L:SetWarningLocalization({
@@ -340,7 +342,8 @@ L:SetOptionLocalization({
 	TimerLanding		= "Show timer for landing",
 	TimerIceBlast		= "Show timer for Frost Breath",
 	WarningDeepBreath	= "Show special warning for Frost Breath",
-	WarningIceblock		= "Yell on Ice Block"
+	WarningIceblock		= "Yell on Ice Block",
+	SpecWarnSapphLow 	= "Special warning for 10% execute phase (cancel air phase)"
 })
 
 L:SetMiscLocalization({
@@ -352,13 +355,14 @@ L:SetWarningLocalization({
 	WarningAirPhaseSoon	= "Air phase in 10 seconds",
 	WarningAirPhaseNow	= "Air phase",
 	WarningLanded		= "Sapphiron landed",
-	WarningDeepBreath	= "Frost Breath"
+	WarningDeepBreath	= "Frost Breath",
+	SpecWarnSapphLow 	= "Sapphiron can't fly!"
 })
 
 L:SetTimerLocalization({
 	TimerAir		= "Air phase",
 	TimerLanding	= "Landing",
-	TimerIceBlast	= "Frost Breath"	
+	TimerIceBlast	= "Frost Breath"
 })
 
 ------------------
@@ -373,22 +377,33 @@ L:SetGeneralLocalization({
 
 L:SetOptionLocalization({
 	TimerPhase2		= "Show timer for Phase 2",
+	MCImminent		= "MC Imminent! (20s)",
 	specwarnP2Soon	= "Show special warning 10 seconds before Kel'Thuzad engages",
+	fissure 		= "Show special warning for Shadow Fissure",
+	manaNear		= "Show special warning when Detonate Mana is nearby",
 	warnAddsSoon	= "Show pre-warning for Guardians of Icecrown",
 	BlastAlarm		= "Play custom siren sound when Frost Blast is being cast",
+	SmileScream		= "Play custom OnlySmile sound for Shadow Fissure(joke)",
+	EqUneqWeaponsKT	= "Automatically unequip and equip weapons before and after Mind Control. Create equip. set named 'pve' for re-equipping",
+	EqUneqWeaponsKT2= "Automatically unequip and equip weapons when MC is cast on YOU",
 	ShowRange		= "Show range frame when Phase 2 starts"
 })
 
 L:SetMiscLocalization({
-	Yell = "Minions, servants, soldiers of the cold dark! Obey the call of Kel'Thuzad!"
+	Yell		= "Minions, servants, soldiers of the cold dark! Obey the call of Kel'Thuzad!",
+	YellMC1		= "Your soul is bound to me, now!",
+	YellMC2		= "There will be no escape!",
+	setMissing	= "ATTENTION! DBM automatic weapon unequipping/equipping will not work until you create a equipment set named pve"
 })
 
 L:SetWarningLocalization({
 	specwarnP2Soon	= "Kel'Thuzad engages in 10 Seconds",
+	fissure 		= "Shadow Fissure",
+	manaNear		= "Detonate Mana nearby",
 	warnAddsSoon	= "Guardians of Icecrown incoming soon"
 })
 
 L:SetTimerLocalization({
-	TimerPhase2	= "Phase 2"
+	TimerPhase2	= "Phase 2",
+	MCImminent	= "MC Imminent! (20s)"
 })
-

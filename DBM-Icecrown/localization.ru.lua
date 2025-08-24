@@ -1,4 +1,4 @@
-﻿if GetLocale() ~= "ruRU" then return end
+if GetLocale() ~= "ruRU" then return end
 
 local L
 
@@ -137,7 +137,8 @@ L:SetWarningLocalization{
 	WarnReanimating				= "Помощник воскрешается",			-- Reanimating an adherent or fanatic
 	WarnTouchInsignificance		= "%s на |3-5(>%s<) (%d)",		-- Touch of Insignificance on >args.destName< (args.amount)
 	WarnAddsSoon				= "Скоро призыв помощников",
-	SpecWarnVengefulShade		= "Мстительный дух атакует вас - бегите"--creatureid 38222
+	SpecWarnVengefulShade		= "Мстительный дух атакует вас - бегите", --creatureid 38222
+	WeaponsStatus				= "Cнятие оружий включено",
 }
 
 L:SetOptionLocalization{
@@ -145,20 +146,28 @@ L:SetOptionLocalization{
 	WarnReanimating				= "Предупреждение при воскрешении помощников",											-- Reanimated Adherent/Fanatic spawning
 	TimerAdds					= "Отсчет времени до призыва помощников",
 	SpecWarnVengefulShade		= "Спец-предупреждение, когда вас атакует Мстительный дух",--creatureid 38222
+	WeaponsStatus				= "Спец-предупреждение в начале боя если включена функция снятия/надевания оружий",
 	ShieldHealthFrame			= "Показывать здоровье босса с индикатором здоровья для \n$spell:70842",
-	WarnTouchInsignificance		= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(71204, GetSpellInfo(71204) or "unknown"),	
+	WarnTouchInsignificance		= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(71204, GetSpellInfo(71204) or "unknown"),
 	SetIconOnDominateMind		= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(71289),
 	SetIconOnDeformedFanatic	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70900),
-	SetIconOnEmpoweredAdherent	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70901)
+	SetIconOnEmpoweredAdherent	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(70901),
+	SoundWarnCountingMC			= "Проигрывать звуковой отсчет 5...1 до контроля разума",
+	EqUneqWeapons				= "Снимать/надевать оружия если в вас кастанулся контроль. Для надевания создайте компл. экип. 'pve'. Для снятия не нужен.",
+	EqUneqTimer					= "Снимать оружия по таймеру ВСЕГДА, а не в каст(если высокий пинг). Опция выше должна быть вкл.",
+	BlockWeapons				= "Полностью заблокировать функции снятия/надевания выше (выкл по ум.)",
+
 }
 
 L:SetMiscLocalization{
 	YellPull				= "Как вы смеете ступать в эти священные покои? Это место станет вашей могилой!",
 	YellReanimatedFanatic	= "Восстань и обрети истинную форму!",
-	ShieldPercent			= "Барьер маны",--Translate Spell id 70842
+	YellMC					= "Ты не в силах противиться моей воле!",
+	ShieldPercent			= "Барьер маны",
 	Fanatic1				= "Фанатик культа",
 	Fanatic2				= "Кособокий фанатик",
-	Fanatic3				= "Воскрешенный фанатик"
+	Fanatic3				= "Воскрешенный фанатик",
+	setMissing				= "ВНИМАНИЕ! DBM: автоматическое снимание/надевание оружия не будет работать пока вы не создадите набор экипировки pve"
 }
 
 ----------------------
@@ -189,11 +198,15 @@ L:SetTimerLocalization{
 
 L:SetMiscLocalization{
 	PullAlliance	= "Запускайте двигатели! Летим навстречу судьбе.",
+	CombatAlliance	= "Ах вы псы трусливые! Напали исподтишка!",
 	KillAlliance	= "Ну не говорите потом, что я не предупреждал. В атаку, братья и сестры!",
 	PullHorde		= "Воспряньте, сыны и дочери Орды! Сегодня мы будем биться со смертельным врагом! ЛОК'ТАР ОГАР!",
+	CombatHorde		= "БОЕВОЙ КОРАБЛЬ АЛЬЯНСА! ВСЕ НА ПАЛУБУ!",
 	KillHorde		= "Альянс повержен. Вперед, к Королю-личу!",
 	AddsAlliance	= "Разрушители, сержанты, в бой!",
-	AddsHorde		= "Marines, Sergeants, attack"
+	AddsHorde		= "Пехота, сержанты, в бой!",
+	MageAlliance	= "Корабль под обстрелом! Боевого мага сюда, пусть заткнет эти пушки!",
+	MageHorde		= "Корабль под обстрелом! Заклинателя сюда, пусть заткнет эти пушки!"
 }
 
 -----------------------------
@@ -245,7 +258,7 @@ L:SetWarningLocalization{
 L:SetOptionLocalization{
 	InhaledBlight		= "Предупреждение для $spell:71912",
 	RangeFrame			= "Показывать окно проверки дистанции (8 м)",
-	WarnGastricBloat	= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(72551, GetSpellInfo(72551) or "unknown"),	
+	WarnGastricBloat	= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(72551, GetSpellInfo(72551) or "unknown"),
 	SetIconOnGasSpore	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(69279),
 	AnnounceSporeIcons	= "Объявлять метки целей заклинания $spell:69279 в рейд-чат\n(требуются права помощника)",
 	AchievementCheck	= "Объявлять о провале достижения 'Масок нет!' в рейд-чат\n(требуются права помощника)"
@@ -371,7 +384,8 @@ L:SetMiscLocalization{
 	Keleseth			= "Принц Келесет",
 	Taldaram			= "Принц Талдарам",
 	Valanar				= "Принц Валанар",
-	EmpoweredFlames		= "Жаркое пламя тянется к (%S+)!"
+	EmpoweredFlames		= "Огни Инферно движутся к (%S+)!",
+	EmpoweredFlames2	= "Жаркое пламя тянется к (%S+)!"
 }
 
 -----------------------------
@@ -412,30 +426,39 @@ L:SetGeneralLocalization{
 }
 
 L:SetWarningLocalization{
-	WarnCorrosion	= "%s на |3-5(>%s<) (%d)",		-- Corrosion on >args.destName< (args.amount)
-	WarnPortalOpen	= "Открытие порталов"
+	WarnPortalOpen	= "Открытие порталов",
+	Suppressors		= "Подавители"
 }
 
 L:SetTimerLocalization{
 	TimerPortalsOpen		= "Открытие порталов",
+	TimerPortalsClose		= "закрытие порталов", -- Needs review
 	TimerBlazingSkeleton	= "Исторгающий пламя скелет",
-	TimerAbom				= "След. поганище?"
+	TimerAbom				= "След. поганище?",
+	TimerSuppressorOne			= "1 волна Подавителей",
+	TimerSuppressorTwo			= "2 волна Подавителей",
+	TimerSuppressorThree		= "3 волна Подавителей",
+	TimerSuppressorFour			= "4 волна Подавителей"
 }
 
 L:SetOptionLocalization{
 	SetIconOnBlazingSkeleton	= "Устанавливать метку на Исторгающего пламя скелета (череп)",
 	WarnPortalOpen				= "Предупреждение об открытии порталов",
 	TimerPortalsOpen			= "Отсчет времени для открытия порталов",
+	TimerPortalsClose			= "Обратный отсчет до закрытия порталов", -- Needs review
 	TimerBlazingSkeleton		= "Отсчет времени до Исторгающего пламя скелета",
 	TimerAbom					= "Отсчет времени до след. Прожорливого поганища (экспериментальный)",
-	WarnCorrosion				= DBM_CORE_AUTO_ANNOUNCE_OPTIONS.spell:format(70751, GetSpellInfo(70751) or "unknown")
+	Suppressors					= "Спец-предупреждение для появления Подавителей",
+	TimerSuppressorOne			= "1 волна Подавителей",
+	TimerSuppressorTwo			= "2 волна Подавителей",
+	TimerSuppressorThree		= "3 волна Подавителей",
+	TimerSuppressorFour			= "4 волна Подавителей"
 }
 
 L:SetMiscLocalization{
 	YellPull		= "Чужаки ворвались во внутренние покои. Уничтожьте зеленого дракона! Пусть останутся лишь кости и прах для воскрешения!",
 	YellKill		= "Я ИЗЛЕЧИЛАСЬ! Изера, даруй мне силу покончить с этими нечестивыми тварями.",
-	YellPortals		= "Я открыла портал в Изумрудный Сон. Там вы найдете спасение, герои...",
-	YellPhase2		= "Силы возвращаются ко мне. Герои, еще немного!"--Need to confirm this is when adds spawn faster (phase 2) before used in mod
+	YellPortals		= "Я открыла портал в Изумрудный Сон. Там вы найдете спасение, герои..."
 }
 
 ------------------
@@ -476,7 +499,7 @@ L:SetOptionLocalization{
 	SetIconOnUnchainedMagic	= DBM_CORE_AUTO_ICONS_OPTION_TEXT:format(69762),
 	ClearIconsOnAirphase	= "Снимать все метки перед воздушной фазой",
 	AchievementCheck		= "Объявлять предупреждения для достижения 'Таинственная дама'\nв рейд-чат (требуются права помощника)",
-	RangeFrame				= "Показывать игроков с метками в окне проверки дистанции (10 норм., 20 гер.)"
+	RangeFrame				= "Показывать игроков в окне проверки дистанции (10/25 гер. режимы)"
 }
 
 L:SetMiscLocalization{
@@ -542,10 +565,16 @@ L:SetOptionLocalization{
 	ValkyrIcon				= "Устанавливать метки на Валь'кир",
 	DefileArrow				= "Показывать стрелку, когда $spell:72762 около вас",
 	TrapArrow				= "Показывать стрелку, когда $spell:73539 около вас",
+	YellInValk				= "Кричать свой никнейм и класс если вы схвачены Валь'Кирой",
 	LKBugWorkaround			= "Отключить синхр-цию для Осквернения и Теневой ловушки\n(вкл. по умолчанию до исправления бага с синхронизацией)",
 	AnnounceValkGrabs		= "Объявлять игроков, схваченных Валь'кирами, в рейд-чат\n(требуются права помощника)",
 	SpecWarnValkyrLow		= "Спец-предупреждение, когда у Валь'киры меньше 55% HP",
-	AnnouncePlagueStack		= "Объявлять стаки заклинания $spell:73912 в рейд-чат (10\nстаков, далее каждые 5) (требуются права помощника)"
+	AnnouncePlagueStack		= "Объявлять стаки заклинания $spell:73912 в рейд-чат (10\nстаков, далее каждые 5) (требуются права помощника)",
+	ShowFrame				= "Показать окно целей Валь'Кир",
+	FrameClassColor			= "Использовать цвета классов в окне целей Валь'Кир",
+	FrameUpwards			= "Рост окна целей Валь'Кир вверх",
+	FrameLocked				= "Зафиксировать окно целей Валь'Кир",
+	RemoveBOP				= "Снимать Длань Защиты и Божественный щит перед выходом из комнаты Ледяной Скорби"
 }
 
 L:SetMiscLocalization{
@@ -558,5 +587,11 @@ L:SetMiscLocalization{
 	ValkGrabbedIcon			= "Валь'кира {rt%d} схватила %s",
 	ValkGrabbed				= "Валь'кира схватила %s",
 	PlagueStackWarning		= "Предупреждение: %s получил %d стаков Мертвящей чумы",
-	AchievementCompleted	= ">> ДОСТИЖЕНИЕ ВЫПОЛНЕНО: %s получил %d стаков Мертвящей чумы <<"
+	AchievementCompleted	= ">> ДОСТИЖЕНИЕ ВЫПОЛНЕНО: %s получил %d стаков Мертвящей чумы <<",
+	FrameTitle				= "Цели Валь'Кир",
+	FrameLock				= "Закрепить окно",
+	FrameClassColor			= "Использовать цвета классов",
+	FrameOrientation		= "Рост вверх",
+	FrameHide				= "Скрыть окно",
+	FrameClose				= "Закрыть"
 }

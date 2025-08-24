@@ -36,8 +36,11 @@ mod:AddBoolOption("PlaySoundOnDevouringFlame", false)
 
 local castFlames
 local combattime = 0
+local isGrounded = false
 
 function mod:OnCombatStart(delay)
+	self:SetStage(1)
+	isGrounded = false
 	enrageTimer:Start(-delay)
 	combattime = GetTime()
 	if mod:IsDifficulty("heroic10") then
@@ -46,8 +49,8 @@ function mod:OnCombatStart(delay)
 		timerTurret1:Start(-delay)
 		timerTurret2:Start(-delay)
 	else
-		warnTurretsReadySoon:Schedule(93-delay)
-		warnTurretsReady:Schedule(113-delay)
+		warnTurretsReadySoon:Schedule(95-delay)
+		warnTurretsReady:Schedule(117-delay)
 		timerTurret1:Start(-delay) -- 53sec
 		timerTurret2:Start(-delay) -- +20
 		timerTurret3:Start(-delay) -- +20
@@ -60,7 +63,7 @@ function mod:SPELL_DAMAGE(args)
 		specWarnDevouringFlame:Show()
 		if self.Options.PlaySoundOnDevouringFlame then
 			PlaySoundFile("Sound\\Creature\\HoodWolf\\HoodWolfTransformPlayer01.wav")
-		end		
+		end
 	end
 end
 
@@ -68,6 +71,8 @@ end
 function mod:CHAT_MSG_RAID_BOSS_EMOTE(emote)
 	if emote == L.EmotePhase2 or emote:find(L.EmotePhase2) then
 		-- phase2
+		self:SetStage(2)
+		isGrounded = true
 		timerTurret1:Stop()
 		timerTurret2:Stop()
 		timerTurret3:Stop()
@@ -77,23 +82,25 @@ function mod:CHAT_MSG_RAID_BOSS_EMOTE(emote)
 end
 
 function mod:CHAT_MSG_MONSTER_YELL(msg, mob)
-	if (msg == L.YellAir or msg == L.YellAir2) and GetTime() - combattime > 30 then
+	if isGrounded and (msg == L.YellAir or msg == L.YellAir2) and GetTime() - combattime > 30 then
+		isGrounded = false -- warmane resets the timers idk why
 		if mod:IsDifficulty("heroic10") then -- not sure?
 			warnTurretsReadySoon:Schedule(23)
 			warnTurretsReady:Schedule(43)
 			timerTurret1:Start(23)
 			timerTurret2:Start(43)
 		else
-			warnTurretsReadySoon:Schedule(93)
-			warnTurretsReady:Schedule(113)
-			timerTurret1:Start()
-			timerTurret2:Start()
-			timerTurret3:Start()
-			timerTurret4:Start()
+			warnTurretsReadySoon:Schedule(123)
+			warnTurretsReady:Schedule(133)
+			timerTurret1:Start(70)
+			timerTurret2:Start(91)
+			timerTurret3:Start(112)
+			timerTurret4:Start(133)
 		end
 
 	elseif msg == L.YellGround then
 		timerGrounded:Start()
+		isGrounded = true
 	end
 end
 
@@ -121,7 +128,7 @@ function mod:UNIT_TARGET(unit)	-- I think this is useless, why would anyone in t
 		end
 		castFlames = false
 	end
-end 
+end
 
 function mod:CastFlame(target)
 	warnDevouringFlameCast:Show(target)
@@ -129,4 +136,4 @@ function mod:CastFlame(target)
 		specWarnDevouringFlameCast:Show()
 	end
 	self:SetIcon(target, 8, 9)
-end 
+end

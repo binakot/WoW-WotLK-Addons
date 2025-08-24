@@ -1,4 +1,4 @@
-﻿if GetLocale() ~= "ruRU" then return end
+if GetLocale() ~= "ruRU" then return end
 
 local L
 
@@ -203,9 +203,9 @@ L:SetGeneralLocalization({
 })
 
 L:SetMiscLocalization({
-	Yell	= "Сталагг сокрушит вас!",
-	Emote	= "Катушка Теслы перезагружается!",
-	Emote2	= "Катушка Теслы теряет связь!",
+	Yell	= "Сталагг сокрушить вас!",
+	Emote	= "%s перезагружается!",
+	Emote2	= "%s теряет связь!",
 	Boss1	= "Фойген",
 	Boss2	= "Сталагг",
 	Charge1 = "отрицательную",
@@ -217,7 +217,8 @@ L:SetOptionLocalization({
 	WarningChargeNotChanged	= "Предупреждение, когда ваша полярность не изменена",
 	ArrowsEnabled			= "Отображать стрелки (обычная \"2-сторонняя\" стратегия)",
 	ArrowsRightLeft			= "Стрелки влево/вправо для \"4-сторонней\" стратегии",
-	ArrowsInverse			= "Обратная \"4-сторонняя\" стратегия (вправо, если полярность изменена, влево, если нет)"
+	ArrowsInverse			= "Обратная \"4-сторонняя\" стратегия (вправо, если полярность изменена, влево, если нет)",
+	SoundWarnCountingShift	= "Проигрывать звуковой отсчет 5...1 до смены полярности"
 })
 
 L:SetWarningLocalization({
@@ -342,11 +343,12 @@ L:SetOptionLocalization({
 	TimerLanding		= "Отсчет времени до приземления",
 	TimerIceBlast		= "Отсчет времени до Ледяного дыхания",
 	WarningDeepBreath	= "Специальное объявление Ледяного Дыхания",
-	WarningIceblock		= "Кричать, когда вы в Ледяной глыбе"
+	WarningIceblock		= "Кричать, когда вы в Ледяной глыбе",
+	SpecWarnSapphLow	= "Спец-предупреждения для 10% босса(отмена воздушной фазы)"
 })
 
 L:SetMiscLocalization({
-	EmoteBreath			= "%s делает глубокий вдох.",
+	EmoteBreath			= "%s глубоко вдыхает.",
 	WarningYellIceblock	= "Я в Ледяной глыбе!"
 })
 
@@ -354,13 +356,14 @@ L:SetWarningLocalization({
 	WarningAirPhaseSoon	= "Воздушная фаза через 10 секунд",
 	WarningAirPhaseNow	= "Воздушная фаза",
 	WarningLanded		= "Сапфирон приземляется",
-	WarningDeepBreath	= "Ледяное дыхание"
+	WarningDeepBreath	= "Ледяное дыхание",
+	SpecWarnSapphLow	= "У Сапфирона нет сил взлететь"
 })
 
 L:SetTimerLocalization({
 	TimerAir		= "Воздушная фаза",
 	TimerLanding	= "Приземление",
-	TimerIceBlast	= "Ледяное дыхание"	
+	TimerIceBlast	= "Ледяное дыхание"
 })
 
 ------------------
@@ -375,22 +378,34 @@ L:SetGeneralLocalization({
 
 L:SetOptionLocalization({
 	TimerPhase2		= "Отсчет времени до фазы 2",
+	MCImminent		= "Сейчас контроль! (20s)",
 	specwarnP2Soon	= "Спец-предупреждение за 10 секунд до вступления Кел'Тузада в бой",
+	fissure 		= "Спец-предупреждение для Взрыва Бездны(войдзона)",
+	manaNear		= "Спец-предупреждение когда рядом Взрыв Маны",
 	warnAddsSoon	= "Предупреждать заранее о Стражах Ледяной Короны",
 	BlastAlarm		= "Воспроизводить специальный звук сирены при применении Ледяного взрыва",
+	SmileScream		= "Проигрывать крик OnlySmile при касте Взрыва Бездны(шуточное)",
+	EqUneqWeaponsKT	= "Снимать/надевать оружия перед/после контроля по таймеру. Для надевания создайте компл. экип. 'pve'. Для снятия не нужен.",
+	EqUneqWeaponsKT2= "Снимать/надевать оружия когда контроль кастуется в вас.",
 	ShowRange		= "Показывать окно проверки дистанции в фазе 2"
 })
 
 L:SetMiscLocalization({
-	Yell = "Соратники, слуги, солдаты холодной тьмы! Повинуйтесь зову Кел'Тузада!"
+	Yell		= "Соратники, слуги, солдаты холодной тьмы! Повинуйтесь зову Кел'Тузада!",
+	YellMC1		= "Теперь твоя душа связана с моей!",
+	YellMC2		= "Тебе не уйти!",
+	setMissing	= "ВНИМАНИЕ! DBM: автоматическое снимание/надевание оружия не будет работать пока вы не создадите набор экипировки pve"
 })
 
 L:SetWarningLocalization({
 	specwarnP2Soon	= "Кел'Тузад вступает в бой через 10 секунд",
+	fissure 		= "Взрыв Бездны",
+	manaNear		= "Рядом Взрыв Маны",
 	warnAddsSoon	= "Скоро прибытие Стражей Ледяной Короны"
 })
 
 L:SetTimerLocalization({
-	TimerPhase2	= "Фаза 2"
+	TimerPhase2	= "Фаза 2",
+	MCImminent	= "Сейчас контроль! (20s)"
 })
 

@@ -1,4 +1,4 @@
-﻿if GetLocale() ~= "ruRU" then return end
+if GetLocale() ~= "ruRU" then return end
 
 local L
 
@@ -121,7 +121,7 @@ L:SetWarningLocalization{
 
 L:SetMiscLocalization{
 	Gorgrim				= "Горгрим Темный Раскол <Рыцарь смерти>",	-- 34458
-	Birana 				= "Бирана Штормовое Копыто <Друид>",		-- 34451
+	Birana				= "Бирана Штормовое Копыто <Друид>",		-- 34451
 	Erin				= "Эрин Мглистое Копыто <Друид>",		-- 34459
 	Rujkah				= "Руж'ка <Охотница>",				-- 34448
 	Ginselle			= "Гинзелль Отразительница Гнили <Маг>",	-- 34449
@@ -135,23 +135,23 @@ L:SetMiscLocalization{
 	Harkzog				= "Харкзог <Чернокнижник>",			-- 34450
 	Narrhok				= "Наррок Крушитель Стали <Воин>",		-- 34453
 	Tyrius				= "Тирий Клинок Сумерек <Рыцарь смерти>",	-- 34461, Allience
- 	Kavina				= "Кавина Песня Рощи <Друид>",			-- 34460, Allience
- 	Melador				= "Меладор Дальний Гонец <Друид>",		-- 34469, Allience
- 	Alyssia 			= "Алисса Лунопард <Охотница>",			-- 34467, Allience
- 	Noozle				= "Нуззл Чудодей <Маг>",			-- 34468, Allience
- 	Baelnor 			= "Бельнор Светоносный <Паладин>",		-- 34471, Allience
- 	Velanaa				= "Веланаа <Паладин>", 				-- 34465, Allience
- 	Anthar				= "Антар Очистительный Горн <Жрец>",		-- 34466, Allience
- 	Brienna				= "Бриенна Приход Ночи <Жрица>",		-- 34473, Allience
- 	Irieth				= "Ириэт Шаг Сквозь Тень <Разбойница>",		-- 34472, Allience
- 	Saamul				= "Саамул <Шаман>", 				-- 34470, Allience
- 	Shaabad				= "Шаабад <Шаман>", 				-- 34463, Allience
- 	Serissa				= "Серисса Мрачная Кропильщица <Чернокнижница>",-- 34474, Allience
- 	Shocuul				= "Шокул <Воин>",				-- 34475, Allience
+	Kavina				= "Кавина Песня Рощи <Друид>",			-- 34460, Allience
+	Melador				= "Меладор Дальний Гонец <Друид>",		-- 34469, Allience
+	Alyssia				= "Алисса Лунопард <Охотница>",			-- 34467, Allience
+	Noozle				= "Нуззл Чудодей <Маг>",			-- 34468, Allience
+	Baelnor				= "Бельнор Светоносный <Паладин>",		-- 34471, Allience
+	Velanaa				= "Веланаа <Паладин>",				-- 34465, Allience
+	Anthar				= "Антар Очистительный Горн <Жрец>",		-- 34466, Allience
+	Brienna				= "Бриенна Приход Ночи <Жрица>",		-- 34473, Allience
+	Irieth				= "Ириэт Шаг Сквозь Тень <Разбойница>",		-- 34472, Allience
+	Saamul				= "Саамул <Шаман>",				-- 34470, Allience
+	Shaabad				= "Шаабад <Шаман>",				-- 34463, Allience
+	Serissa				= "Серисса Мрачная Кропильщица <Чернокнижница>",-- 34474, Allience
+	Shocuul				= "Шокул <Воин>",				-- 34475, Allience
 	AllianceVictory		= "СЛАВА АЛЬЯНСУ!",
 	HordeVictory		= "That was just a taste of what the future brings. FOR THE HORDE!",
 	YellKill			= "Пустая и горькая победа. После сегодняшних потерь мы стали слабее как целое. Кто еще, кроме Короля-лича, выиграет от подобной глупости? Пали великие воины. И ради чего? Истинная опасность еще впереди – нас ждет битва с  Королем-личом."
-} 
+}
 
 L:SetOptionLocalization{
 	PlaySoundOnBladestorm	= "Звуковой сигнал при Вихре клинков"
@@ -167,7 +167,8 @@ L:SetGeneralLocalization{
 }
 
 L:SetTimerLocalization{
-	TimerSpecialSpell	= "Следующая спец-способность"	
+	TimerSpecialSpell	= "Следующая спец-способность",
+	TimerRoleplay		= "Представление перед падением"
 }
 
 L:SetWarningLocalization{
@@ -182,12 +183,15 @@ L:SetWarningLocalization{
 
 L:SetMiscLocalization{
 	YellPull	= "Во имя темного повелителя. Во имя Короля-лича. Вы. Умрете.",
+	CombatStart	= "Лишь сплотившись, вы сможете пройти последнее испытание. Из глубин Ледяной Короны навстречу вам подымаются две могучие воительницы Плети: жуткие валь'киры, крылатые вестницы Короля-лича!",
 	Fjola		= "Фьола Погибель Света",
 	Eydis		= "Эйдис Погибель Тьмы"
 }
 
 L:SetOptionLocalization{
 	TimerSpecialSpell			= "Отсчет времени до перезарядки спец-способности",
+	TimerRoleplay				= "Таймер представления перед падением (после победы)",
+	SpecialSpellSoundCountdown	= "5-секундный звуковой отсчет до следующей спец-способности",
 	WarnSpecialSpellSoon		= "Предупреждение о следующуюей спец-способность",
 	SpecWarnSpecial				= "Спец-предупреждение для смены цветов",
 	SpecWarnSwitchTarget		= "Спец-предупреждение для других, когда босс читает заклинание",
@@ -205,7 +209,7 @@ L:SetOptionLocalization{
 L = DBM:GetModLocalization("Anub'arak_Coliseum")
 
 L:SetGeneralLocalization{
-	name 					= "Ануб'арак"
+	name					= "Ануб'арак"
 }
 
 L:SetTimerLocalization{
@@ -247,7 +251,7 @@ L:SetOptionLocalization{
 	PlaySoundOnPursue		= "Звуковой сигнал, если вас преследуют",
 	PursueIcon				= "Устанавливать метки на преследуемых",
 	SpecWarnShadowStrike	= "Спец-предупреждение для $spell:66134 (для прерывания)",
-	RemoveHealthBuffsInP3	= "Удалять усиления здоровья в начале фазы 3", 
+	RemoveHealthBuffsInP3	= "Удалять усиления здоровья в начале фазы 3",
 	SetIconsOnPCold         = "Устанавливать метки на цели заклинания $spell:68510",
 	AnnouncePColdIcons		= "Объявлять метки целей заклинания $spell:68510 в рейд-чат\n(требуются права лидера или помощника)",
 	AnnouncePColdIconsRemoved	= "Объявлять также о снятии меток с целей заклинания $spell:68510\n(требуется предыдущая опция)"
