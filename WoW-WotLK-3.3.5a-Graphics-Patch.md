@@ -10,15 +10,6 @@ SET maxFPS "0"
 SET processAffinityMask "255"
 ```
 
-## WoW Patch 3.3.5a
-
-1. Download the latest patch from [VK](https://vk.com/wow_patch). Current version `4.4`: [GDrive](https://vk.com/away.php?to=https%3A%2F%2Fdrive.google.com%2Ffile%2Fd%2F1l3jR-r5pyvFlQk6CnPjopZkY_WYP40-K%2Fview%3Fusp%3Dsharing&utf=1) or [Torrent](https://vk.com/doc613917273_686248351?hash=J9wgEvOhoev5orshkgkSETU4lsoBxZXEmaRlQhdwins&dl=1YhkQcXHlytAlPc7r79oVaTyDU4bUVVWXjtXgK45AzD).
-2. Extract the `.rar` archive usin WinRAR. If you get an error, update WinRAR to the latest version: [WinRAR](https://www.win-rar.com/).
-3. Make a backup copy of your WoW game folder.
-4. Open the installation guide located in the root of the extracted patch folder.
-5. Install all patches **except** `Patch-ruRU-W.mpq` if you are playing on [WoWCircle](https://wowcircle.net/).
-6. Run `Wow.exe` and check if the game starts properly.
-
 ## Vulkan (DXVK)
 
 1. Download the latest version of `DXVK` from [GitHub Release page](https://github.com/doitsujin/dxvk/releases).
@@ -33,6 +24,15 @@ dxvk.numCompilerThreads = 0
 ```
 
 5. Run `Wow.exe` and check if the game works correctly.
+
+## WoW Graphic Patch
+
+1. Download the latest patch from [VK](https://vk.com/wow_patch). Current version `4.4`: [GDrive](https://vk.com/away.php?to=https%3A%2F%2Fdrive.google.com%2Ffile%2Fd%2F1l3jR-r5pyvFlQk6CnPjopZkY_WYP40-K%2Fview%3Fusp%3Dsharing&utf=1) or [Torrent](https://vk.com/doc613917273_686248351?hash=J9wgEvOhoev5orshkgkSETU4lsoBxZXEmaRlQhdwins&dl=1YhkQcXHlytAlPc7r79oVaTyDU4bUVVWXjtXgK45AzD).
+2. Extract the `.rar` archive usin WinRAR. If you get an error, update WinRAR to the latest version: [WinRAR](https://www.win-rar.com/).
+3. Make a backup copy of your WoW game folder.
+4. Open the installation guide located in the root of the extracted patch folder.
+5. Install all patches **except** `Patch-ruRU-W.mpq` if you are playing on [WoWCircle](https://wowcircle.net/).
+6. Run `Wow.exe` and check if the game starts properly.
 
 ## Fonts
 
